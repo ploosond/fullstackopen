@@ -1,4 +1,7 @@
 const App = () => {
+  const name = () => {
+    console.log("prajwol")
+  }
   const course = {
     name: "Half Stack application development",
     parts: [
