@@ -6,42 +6,43 @@ import Details from "./components/Details"
 
 const App = () => {
   const [persons, setPersons] = useState([])
+  const [newName, setNewName] = useState("")
+  const [newNumber, setNewNumber] = useState("")
+  const [search, setSearch] = useState("")
 
   useEffect(() => {
-    console.log("effect")
     axios.get("http://localhost:3001/persons").then((response) => {
       setPersons(response.data)
     })
   }, [])
 
-  const [newName, setNewName] = useState("")
-  const [newNumber, setNewNumber] = useState("")
-  const [search, setSearch] = useState("")
-
   const filteredPersons = persons.filter((person) =>
     person.name.toLowerCase().includes(search.toLowerCase())
   )
-  // console.log(filteredPersons)
 
   const addName = (event) => {
     event.preventDefault()
     const duplicate = persons.find((person) => person.name === newName)
-    // console.log(persons)
-    // console.log(duplicate)
     if (duplicate) {
       alert(`${newName} is already added to phonebook`)
       return
     }
 
-    setPersons(
-      persons.concat({
-        name: newName,
-        number: newNumber,
-        id: persons.length + 1,
+    const newPerson = {
+      name: newName,
+      number: newNumber,
+    }
+
+    axios
+      .post("http://localhost:3001/persons", newPerson)
+      .then((response) => {
+        setPersons(persons.concat(response.data))
+        setNewName("")
+        setNewNumber("")
       })
-    )
-    setNewName("")
-    setNewNumber("")
+      .catch((error) => {
+        console.log(`Error: ${error}`)
+      })
   }
 
   const handleName = (event) => {
