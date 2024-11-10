@@ -49,12 +49,10 @@ const App = () => {
   }
 
   const handleDelete = (id) => {
-    const url = `http://localhost:3001/persons/${id}`
     const deleteUser = persons.find((p) => p.id === id)
-
     if (window.confirm(`Delete ${deleteUser.name} ?`)) {
-      axios.delete(url).then((response) => {
-        setPersons(persons.filter((p) => p.id !== id))
+      numbersService.deletedUser(id).then((returnedUser) => {
+        setPersons(persons.filter((p) => p.id !== returnedUser.id))
       })
     }
   }
