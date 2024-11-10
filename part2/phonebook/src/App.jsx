@@ -3,6 +3,7 @@ import axios from "axios"
 import Search from "./components/Search"
 import Form from "./components/Form"
 import Details from "./components/Details"
+import numbersService from "./services/numbers"
 
 const App = () => {
   const [persons, setPersons] = useState([])
@@ -11,9 +12,13 @@ const App = () => {
   const [search, setSearch] = useState("")
 
   useEffect(() => {
-    axios.get("http://localhost:3001/persons").then((response) => {
-      setPersons(response.data)
-    })
+    numbersService
+      .getAll()
+      .then((initialResponse) => {
+        // console.log(initialResponse)
+        setPersons(initialResponse)
+      })
+      .catch((error) => console.log(error))
   }, [])
 
   const filteredPersons = persons.filter((person) =>
@@ -33,16 +38,14 @@ const App = () => {
       number: newNumber,
     }
 
-    axios
-      .post("http://localhost:3001/persons", newPerson)
-      .then((response) => {
-        setPersons(persons.concat(response.data))
+    numbersService
+      .create(newPerson)
+      .then((returnedPerson) => {
+        setPersons(persons.concat(returnedPerson))
         setNewName("")
         setNewNumber("")
       })
-      .catch((error) => {
-        console.log(`Error: ${error}`)
-      })
+      .catch((error) => console.log(error))
   }
 
   const handleName = (event) => {
