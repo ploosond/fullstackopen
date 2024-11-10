@@ -48,6 +48,17 @@ const App = () => {
       .catch((error) => console.log(error))
   }
 
+  const handleDelete = (id) => {
+    const url = `http://localhost:3001/persons/${id}`
+    const deleteUser = persons.find((p) => p.id === id)
+
+    if (window.confirm(`Delete ${deleteUser.name} ?`)) {
+      axios.delete(url).then((response) => {
+        setPersons(persons.filter((p) => p.id !== id))
+      })
+    }
+  }
+
   const handleName = (event) => {
     setNewName(event.target.value)
   }
@@ -72,7 +83,7 @@ const App = () => {
         newNumber={newNumber}
       />
       <h2>Numbers</h2>
-      <Details filteredPersons={filteredPersons} />
+      <Details handleDelete={handleDelete} filteredPersons={filteredPersons} />
     </div>
   )
 }
