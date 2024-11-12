@@ -27,9 +27,35 @@ const App = () => {
 
   const addName = (event) => {
     event.preventDefault()
-    const duplicate = persons.find((person) => person.name === newName)
+    const duplicate = persons.find(
+      (person) => person.name.toLowerCase() === newName.toLowerCase()
+    )
+
     if (duplicate) {
-      alert(`${newName} is already added to phonebook`)
+      if (duplicate.number !== newNumber) {
+        if (
+          window.confirm(
+            `${duplicate.name} is already added to phonebook, repalce the old number with a new one?`
+          )
+        ) {
+          const updatedDetail = {
+            ...duplicate,
+            number: newNumber,
+          }
+
+          numbersService
+            .update(duplicate.id, updatedDetail)
+            .then((response) => {
+              setPersons(
+                persons.map((p) => (p.id === duplicate.id ? response : p))
+              )
+              setNewName("")
+              setNewNumber("")
+            })
+        }
+      } else {
+        alert(`${newName} is already added to phonebook`)
+      }
       return
     }
 
@@ -37,6 +63,8 @@ const App = () => {
       name: newName,
       number: newNumber,
     }
+
+    // use condition here to update the entry number
 
     numbersService
       .create(newPerson)
