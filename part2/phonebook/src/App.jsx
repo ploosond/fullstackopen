@@ -52,6 +52,7 @@ const App = () => {
               setNewName("")
               setNewNumber("")
             })
+            .catch((error) => console.log(error))
         }
       } else {
         alert(`${newName} is already added to phonebook`)
@@ -79,9 +80,12 @@ const App = () => {
   const handleDelete = (id) => {
     const deleteUser = persons.find((p) => p.id === id)
     if (window.confirm(`Delete ${deleteUser.name} ?`)) {
-      numbersService.deletedUser(id).then((returnedUser) => {
-        setPersons(persons.filter((p) => p.id !== returnedUser.id))
-      })
+      numbersService
+        .deletedUser(id)
+        .then((returnedUser) => {
+          setPersons(persons.filter((p) => p.id !== returnedUser.id))
+        })
+        .catch((error) => console.log(error))
     }
   }
 
