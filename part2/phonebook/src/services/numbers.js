@@ -21,4 +21,11 @@ const deletedUser = (id) => {
   return request.then((response) => response.data)
 }
 
-export default { getAll, create, update, deletedUser }
+const capitalizeWords = (name) => {
+  return name
+    .split(" ")
+    .map((n) => n[0].toUpperCase().concat(n.slice(1)))
+    .join(" ")
+}
+
+export default { getAll, create, update, deletedUser, capitalizeWords }

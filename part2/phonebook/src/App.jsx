@@ -4,6 +4,7 @@ import Form from "./components/Form"
 import Details from "./components/Details"
 import Notification from "./components/Notification"
 import numbersService from "./services/numbers"
+import ErrorNotification from "./components/ErrorNotification"
 
 const App = () => {
   const [persons, setPersons] = useState([])
@@ -11,6 +12,7 @@ const App = () => {
   const [newNumber, setNewNumber] = useState("")
   const [search, setSearch] = useState("")
   const [message, setMessage] = useState(null)
+  const [errorMessage, setErrorMessage] = useState(null)
 
   useEffect(() => {
     numbersService
@@ -35,7 +37,9 @@ const App = () => {
       if (duplicate.number !== newNumber) {
         if (
           window.confirm(
-            `${duplicate.name} is already added to phonebook, repalce the old number with a new one?`
+            `${numbersService.capitalizeWords(
+              duplicate.name
+            )} is already added to phonebook, repalce the old number with a new one?`
           )
         ) {
           const updatedDetail = {
@@ -52,7 +56,17 @@ const App = () => {
               setNewName("")
               setNewNumber("")
             })
-            .catch((error) => console.log(error))
+            .catch((error) => {
+              console.log(error)
+              setErrorMessage(
+                `Information of ${numbersService.capitalizeWords(
+                  newName
+                )} has already been removed from server`
+              )
+              setTimeout(() => {
+                setErrorMessage(null)
+              }, 5000)
+            })
         }
       } else {
         alert(`${newName} is already added to phonebook`)
@@ -61,7 +75,7 @@ const App = () => {
     }
 
     const newPerson = {
-      name: newName,
+      name: numbersService.capitalizeWords(newName),
       number: newNumber,
     }
 
@@ -71,12 +85,7 @@ const App = () => {
         setPersons(persons.concat(returnedPerson))
         setNewName("")
         setNewNumber("")
-        setMessage(
-          `Added ${newName
-            .split(" ")
-            .map((n) => n[0].toUpperCase().concat(n.slice(1)))
-            .join(" ")}`
-        )
+        setMessage(`Added ${numbersService.capitalizeWords(newName)}`)
         setTimeout(() => {
           setMessage(null)
         }, 3000)
@@ -86,7 +95,11 @@ const App = () => {
 
   const handleDelete = (id) => {
     const deleteUser = persons.find((p) => p.id === id)
-    if (window.confirm(`Delete ${deleteUser.name} ?`)) {
+    if (
+      window.confirm(
+        `Delete ${numbersService.capitalizeWords(deleteUser.name)} ?`
+      )
+    ) {
       numbersService
         .deletedUser(id)
         .then((returnedUser) => {
@@ -111,6 +124,7 @@ const App = () => {
     <div>
       <h2>Phonebook</h2>
       <Notification message={message} />
+      <ErrorNotification errorMessage={errorMessage} />
       <Search handleFilter={handleFilter} search={search} />
       <h2>add a new</h2>
       <Form
