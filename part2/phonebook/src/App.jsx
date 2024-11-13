@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react"
-import axios from "axios"
 import Search from "./components/Search"
 import Form from "./components/Form"
 import Details from "./components/Details"
+import Notification from "./components/Notification"
 import numbersService from "./services/numbers"
 
 const App = () => {
@@ -10,12 +10,12 @@ const App = () => {
   const [newName, setNewName] = useState("")
   const [newNumber, setNewNumber] = useState("")
   const [search, setSearch] = useState("")
+  const [message, setMessage] = useState(null)
 
   useEffect(() => {
     numbersService
       .getAll()
       .then((initialResponse) => {
-        // console.log(initialResponse)
         setPersons(initialResponse)
       })
       .catch((error) => console.log(error))
@@ -65,14 +65,21 @@ const App = () => {
       number: newNumber,
     }
 
-    // use condition here to update the entry number
-
     numbersService
       .create(newPerson)
       .then((returnedPerson) => {
         setPersons(persons.concat(returnedPerson))
         setNewName("")
         setNewNumber("")
+        setMessage(
+          `Added ${newName
+            .split(" ")
+            .map((n) => n[0].toUpperCase().concat(n.slice(1)))
+            .join(" ")}`
+        )
+        setTimeout(() => {
+          setMessage(null)
+        }, 3000)
       })
       .catch((error) => console.log(error))
   }
@@ -103,6 +110,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message={message} />
       <Search handleFilter={handleFilter} search={search} />
       <h2>add a new</h2>
       <Form
