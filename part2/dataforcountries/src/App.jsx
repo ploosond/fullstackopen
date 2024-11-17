@@ -5,6 +5,7 @@ const App = () => {
   const [input, setInput] = useState("")
   const [countries, setCountries] = useState([])
   const [isTrue, setIsTrue] = useState(null)
+  const [showCountry, setShowCountry] = useState(null)
 
   useEffect(() => {
     if (isTrue) {
@@ -25,15 +26,31 @@ const App = () => {
     c.toLowerCase().includes(input.toLowerCase())
   )
 
+  const handleClick = (country) => {
+    setShowCountry(country)
+    console.log(`Show details of ${country}`)
+  }
+
   return (
     <div>
       find countries <input type="text" value={input} onChange={handleChange} />
-      {filteredCountries.length === 1 ? (
-        <CountryDetail country={filteredCountries[0]} />
-      ) : filteredCountries.length <= 10 ? (
-        filteredCountries.map((c, i) => <p key={i}>{c}</p>)
+      {showCountry ? (
+        <CountryDetail country={showCountry} />
       ) : (
-        <p>Too many matches, specify another filter</p>
+        <div>
+          {filteredCountries.length === 1 ? (
+            <CountryDetail country={filteredCountries[0]} />
+          ) : filteredCountries.length <= 10 ? (
+            filteredCountries.map((c, i) => (
+              <p key={i}>
+                {c}
+                <button onClick={() => handleClick(c)}>show</button>
+              </p>
+            ))
+          ) : (
+            <p>Too many matches, specify another filter</p>
+          )}
+        </div>
       )}
     </div>
   )
