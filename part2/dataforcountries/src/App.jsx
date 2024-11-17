@@ -58,14 +58,32 @@ const App = () => {
 
 const CountryDetail = ({ country }) => {
   const [details, setDetails] = useState([])
+  const [capital, setCapital] = useState("")
+  const [weather, setWeather] = useState([])
 
   useEffect(() => {
     axios
       .get(`https://studies.cs.helsinki.fi/restcountries/api/name/${country}`)
       .then((response) => {
         setDetails(details.concat(response.data))
+        setCapital(response.data.capital[0])
+        // console.log(response.data.capital[0])
       })
   }, [])
+
+  useEffect(() => {
+    if (capital) {
+      const API_KEY = import.meta.env.VITE_WEATHER_API_KEY
+      axios
+        .get(
+          `https://api.openweathermap.org/data/2.5/weather?q=${capital}&appid=${API_KEY}`
+        )
+        .then((response) => {
+          setWeather(weather.concat(response.data))
+          console.log(response.data)
+        })
+    }
+  }, [capital])
   return (
     <div>
       {details.map((c, i) => {
@@ -81,6 +99,19 @@ const CountryDetail = ({ country }) => {
               ))}
             </ul>
             <img src={c.flags.svg} />
+          </div>
+        )
+      })}
+      {weather.map((d, i) => {
+        return (
+          <div key={i}>
+            <h2>Weather in {d.name}</h2>
+            <p>temperature {d.main.temp}</p>
+            <img
+              src={`https://openweathermap.org/img/wn/${d.weather[0].icon}@2x.png`}
+              alt=""
+            />
+            <p>wind {d.wind.speed}</p>
           </div>
         )
       })}
