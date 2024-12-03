@@ -6,14 +6,12 @@ const initialBlogs = [
     author: 'Jane Doe',
     url: 'www.techjourneyblog.com/backend-nodejs-deployment',
     likes: 10,
-    id: '6747350c97b5104b00cdb19e',
   },
   {
     title: '10 Tips for Building a Scalable E-commerce Platform',
     author: 'John Smith',
     url: 'John Smith',
     likes: 857,
-    id: '6747355197b5104b00cdb1a0',
   },
 ]
 

@@ -24,6 +24,13 @@ test.only('all blogs are retunred in JSON format', async () => {
   assert.strictEqual(response.body.length, helper.initialBlogs.length)
 })
 
+test.only('blog post unique identifier is named id, not _id', async () => {
+  const response = await api.get(`/api/blogs/`)
+  const blogs = response.body
+  assert(blogs.every((blog) => blog.hasOwnProperty('id')))
+  assert(!blogs.every((blog) => blog.hasOwnProperty('_id')))
+})
+
 after(async () => {
   await mongoose.connection.close()
 })
