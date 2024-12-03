@@ -54,6 +54,26 @@ test.only('POST request creates a new blog post', async () => {
   assert(contents.includes(blog.title))
 })
 
+test.only('if likes is missing default value is 0', async () => {
+  const blog = {
+    title: 'Blog without likes',
+    author: 'John Smith',
+    url: 'John Smith',
+  }
+
+  await api
+    .post('/api/blogs')
+    .send(blog)
+    .expect(201)
+    .expect('Content-Type', /application\/json/)
+
+  const response = await api.get('/api/blogs')
+  const blogWithOutLikes = response.body.find(
+    (blog) => blog.title === 'Blog without likes'
+  )
+  assert.strictEqual(blogWithOutLikes.likes, 0)
+})
+
 after(async () => {
   await mongoose.connection.close()
 })
