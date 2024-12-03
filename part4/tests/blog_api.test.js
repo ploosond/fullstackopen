@@ -87,9 +87,36 @@ test.only('if title or url is missing, backend responds 400 Bad Request', async 
 
 test.only('single blog post delete', async () => {
   const blogsAtStart = await helper.BlogsInDb()
-  const blogIdToDelete = blogsAtStart[0].id
+  const blogToDelete = blogsAtStart[1]
 
-  await api.delete(`/api/blogs/${blogIdToDelete}`).expect(204)
+  await api.delete(`/api/blogs/${blogToDelete.id}`).expect(204)
+
+  const blogsAtEnd = await api.get('/api/blogs')
+  const contents = blogsAtEnd.body.map((blog) => blog)
+  assert.strictEqual(blogsAtStart.length - 1, blogsAtEnd.body.length)
+  assert(!contents.includes(blogToDelete.title))
+})
+
+test.only('update the information of an individual blog post', async () => {
+  const blogsAtStart = await helper.BlogsInDb()
+  const blogToUpdate = blogsAtStart[0]
+  const blog = {
+    title: '10 Tips for Building a Scalable E-commerce Platform',
+    author: 'John Smith',
+    url: 'Prajwol',
+    likes: 100,
+  }
+
+  const updatedBlog = await api
+    .put(`/api/blogs/${blogToUpdate.id}`)
+    .send(blog)
+    .expect(200)
+    .expect('Content-Type', /application\/json/)
+
+  assert.strictEqual(blog.title, updatedBlog.body.title)
+  assert.strictEqual(blog.author, updatedBlog.body.author)
+  assert.strictEqual(blog.url, updatedBlog.body.url)
+  assert.strictEqual(blog.likes, updatedBlog.body.likes)
 })
 
 after(async () => {
