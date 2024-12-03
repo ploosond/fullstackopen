@@ -74,6 +74,24 @@ test.only('if likes is missing default value is 0', async () => {
   assert.strictEqual(blogWithOutLikes.likes, 0)
 })
 
+test.only('if title or url is missing, backend responds 400 Bad Request', async () => {
+  const blog = {
+    // title: '10 Tips for Building a Scalable E-commerce Platform',
+    author: 'John Smith',
+    url: 'John Smith',
+    likes: 857,
+  }
+
+  await api.post('/api/blogs').send(blog).expect(400)
+})
+
+test.only('single blog post delete', async () => {
+  const blogsAtStart = await helper.BlogsInDb()
+  const blogIdToDelete = blogsAtStart[0].id
+
+  await api.delete(`/api/blogs/${blogIdToDelete}`).expect(204)
+})
+
 after(async () => {
   await mongoose.connection.close()
 })
