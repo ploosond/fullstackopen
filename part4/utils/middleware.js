@@ -1,5 +1,16 @@
 const logger = require('../utils/logger')
 
+const tokenExtractor = (req, res, next) => {
+  const authorization = req.get('authorization')
+  if (authorization && authorization.startsWith('Bearer ')) {
+    req.token = authorization.replace('Bearer ', '')
+  } else {
+    return null
+  }
+
+  next()
+}
+
 const requestLogger = (req, res, next) => {
   logger.info('Method:', req.method)
   logger.info('Path:', req.path)
@@ -34,16 +45,7 @@ const errorHandler = (error, req, res, next) => {
     }
   }
 
-  // if (
-  //   error.code === 11000 &&
-  //   error.message.includes('E11000 duplicate key error')
-  // ) {
-  //   return res.status(400).json({
-  //     error: `The username ${error.keyValue.username} already exists.`,
-  //   })
-  // }
-
   next(error)
 }
 
-module.exports = { requestLogger, unknownRequest, errorHandler }
+module.exports = { tokenExtractor, requestLogger, unknownRequest, errorHandler }

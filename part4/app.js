@@ -27,6 +27,9 @@ app.use(cors())
 app.use(express.static('dist'))
 app.use(express.json())
 
+// json token sent to res.body now it makes available in req.token
+app.use(middleware.tokenExtractor)
+
 app.use('/api/blogs', blogsRouter)
 
 app.use('/api/users', userRouter)
