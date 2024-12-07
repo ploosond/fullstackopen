@@ -1,6 +1,6 @@
 const blogsRouter = require('express').Router()
 const Blog = require('../models/blog')
-const User = require('../models/user')
+const middleware = require('../utils/middleware')
 
 const jwt = require('jsonwebtoken')
 
@@ -9,14 +9,14 @@ blogsRouter.get('/', async (req, res) => {
   res.json(blogs)
 })
 
-blogsRouter.post('/', async (req, res) => {
+blogsRouter.post('/', middleware.userExtractor, async (req, res) => {
   const body = req.body
   const decodedToken = jwt.verify(req.token, process.env.SECRET)
   if (!decodedToken) {
     return res.status(401).json({ error: 'token invalid' })
   }
 
-  const user = await User.findById(decodedToken.id)
+  const user = req.user
 
   const blog = new Blog({
     title: body.title,
@@ -50,13 +50,14 @@ blogsRouter.put('/:id', async (req, res) => {
 
 blogsRouter.delete('/:id', async (req, res) => {
   const blog = await Blog.findById(req.params.id)
+  const user = req.user
 
   const decodedToken = jwt.verify(req.token, process.env.SECRET)
   if (!decodedToken) {
     res.status(401).json({ error: 'invalid token' })
   }
 
-  if (decodedToken.id !== blog.user.toString()) {
+  if (user._id.toString() !== blog.user.toString()) {
     return res
       .status(401)
       .json('Unauthorized request, blog was created by someone else')
