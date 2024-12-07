@@ -5,9 +5,8 @@ const tokenExtractor = (req, res, next) => {
   if (authorization && authorization.startsWith('Bearer ')) {
     req.token = authorization.replace('Bearer ', '')
   } else {
-    return null
+    req.token = null
   }
-
   next()
 }
 
