@@ -13,7 +13,10 @@ blogsRouter.post('/', middleware.userExtractor, async (req, res) => {
   const body = req.body
   const decodedToken = jwt.verify(req.token, process.env.SECRET)
   if (!decodedToken) {
-    return res.status(401).json({ error: 'token invalid' })
+    return res.status(401).json({ error: 'invalid token' })
+  }
+  if (!body.title || !body.url) {
+    return res.status(400).json({ error: 'both title and url are required' })
   }
 
   const user = req.user
@@ -22,7 +25,7 @@ blogsRouter.post('/', middleware.userExtractor, async (req, res) => {
     title: body.title,
     author: body.author,
     url: body.url,
-    likes: body.likes,
+    likes: body.likes || 0,
     user: user._id,
   })
 
@@ -48,7 +51,7 @@ blogsRouter.put('/:id', async (req, res) => {
   res.status(200).send(updatedBlog)
 })
 
-blogsRouter.delete('/:id', async (req, res) => {
+blogsRouter.delete('/:id', middleware.userExtractor, async (req, res) => {
   const blog = await Blog.findById(req.params.id)
   const user = req.user
 
@@ -57,7 +60,7 @@ blogsRouter.delete('/:id', async (req, res) => {
     res.status(401).json({ error: 'invalid token' })
   }
 
-  if (user._id.toString() !== blog.user.toString()) {
+  if (blog.user.toString() !== user.id) {
     return res
       .status(401)
       .json('Unauthorized request, blog was created by someone else')

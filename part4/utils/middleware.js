@@ -57,6 +57,8 @@ const errorHandler = (error, req, res, next) => {
         error: 'The username must be unique.',
       })
     }
+  } else if (error.name === 'JsonWebTokenError') {
+    return res.status(401).json({ error: 'token missing' })
   }
 
   next(error)
