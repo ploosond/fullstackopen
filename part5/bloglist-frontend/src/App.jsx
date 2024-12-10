@@ -3,6 +3,8 @@ import Blog from './components/Blog'
 import blogService from './services/blogs'
 import loginService from './services/login'
 
+import './App.css'
+
 const App = () => {
   const [blogs, setBlogs] = useState([])
   const [username, setUsername] = useState('')
@@ -12,6 +14,9 @@ const App = () => {
   const [title, setTitle] = useState('')
   const [author, setAuthor] = useState('')
   const [url, setUrl] = useState('')
+
+  const [successMessage, setSuccessMessage] = useState(null)
+  const [errorMessage, setErrorMessage] = useState(null)
 
   useEffect(() => {
     blogService.getAll().then((blogs) => setBlogs(blogs))
@@ -34,6 +39,10 @@ const App = () => {
       setPassword('')
     } catch (exception) {
       console.log(exception)
+      setErrorMessage(`wrong username or password`)
+      setTimeout(() => {
+        setErrorMessage(null)
+      }, 5000)
     }
   }
 
@@ -47,10 +56,18 @@ const App = () => {
     try {
       const blog = await blogService.create({ title, author, url })
       setBlogs(blogs.concat(blog))
+      setSuccessMessage(`a  new blog ${title} by ${author}`)
+      setTimeout(() => {
+        setSuccessMessage(null)
+      }, 5000)
       setTitle('')
       setAuthor('')
       setUrl('')
     } catch (exception) {
+      setErrorMessage(`fail to add a  new blog`)
+      setTimeout(() => {
+        setErrorMessage(null)
+      }, 5000)
       console.log(exception)
     }
   }
@@ -59,6 +76,7 @@ const App = () => {
     return (
       <div>
         <h2>Log in to application</h2>
+        {errorMessage && <p className="error">{errorMessage}</p>}
         <form onSubmit={handleLogin}>
           <div>
             username
@@ -87,6 +105,8 @@ const App = () => {
   return (
     <div>
       <h2>blogs</h2>
+      {successMessage && <p className="success">{successMessage}</p>}
+      {errorMessage && <p className="error">{errorMessage}</p>}
       <p>
         {user.name} logged in
         <button onClick={handleLogout}>logout</button>
