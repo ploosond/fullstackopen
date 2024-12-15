@@ -1,20 +1,27 @@
-import React from 'react'
+import React, { useState } from 'react'
 
-const BlogForm = ({
-  handleNewBlog,
-  title,
-  author,
-  url,
-  setTitle,
-  setAuthor,
-  setUrl,
-}) => {
+const BlogForm = ({ handleNewBlog }) => {
+  const [title, setTitle] = useState('')
+  const [author, setAuthor] = useState('')
+  const [url, setUrl] = useState('')
+
+  const addBlog = (event) => {
+    event.preventDefault()
+    handleNewBlog({
+      title: title,
+      author: author,
+      url: url,
+    })
+    setTitle('')
+    setAuthor('')
+    setUrl('')
+  }
   return (
     <div>
       <h2>create new</h2>
-      <form onSubmit={handleNewBlog}>
+      <form onSubmit={addBlog}>
         <div>
-          title{' '}
+          title
           <input
             type="text"
             name="title"
@@ -23,7 +30,7 @@ const BlogForm = ({
           />
         </div>
         <div>
-          author{' '}
+          author
           <input
             type="text"
             name="author"
@@ -32,7 +39,7 @@ const BlogForm = ({
           />
         </div>
         <div>
-          url{' '}
+          url
           <input
             type="text"
             name="url"
