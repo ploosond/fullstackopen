@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import PropTypes from 'prop-types'
 
 const Blog = ({ blog, handleUpdateBlog, handleRemoveBlog }) => {
   const [blogView, setBlogView] = useState(false)
@@ -28,6 +29,12 @@ const Blog = ({ blog, handleUpdateBlog, handleRemoveBlog }) => {
 
   const handleRemove = () => {
     handleRemoveBlog({ ...blog })
+  }
+
+  Blog.propTypes = {
+    blog: PropTypes.object.isRequired,
+    handleUpdateBlog: PropTypes.func.isRequired,
+    handleRemoveBlog: PropTypes.func.isRequired,
   }
 
   return (

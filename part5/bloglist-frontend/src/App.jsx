@@ -43,7 +43,7 @@ const App = () => {
       setPassword('')
     } catch (exception) {
       console.log(exception)
-      setErrorMessage(`wrong username or password`)
+      setErrorMessage('wrong username or password')
       setTimeout(() => {
         setErrorMessage(null)
       }, 3000)
@@ -68,7 +68,7 @@ const App = () => {
       }, 3000)
       blogFormRef.current.toggleVisibility()
     } catch (exception) {
-      setErrorMessage(`fail to add a  new blog`)
+      setErrorMessage('fail to add a  new blog')
       setTimeout(() => {
         setErrorMessage(null)
       }, 3000)
