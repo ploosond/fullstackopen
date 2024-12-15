@@ -19,13 +19,11 @@ const Blog = ({ blog, handleUpdateBlog }) => {
   }
 
   const handleLike = () => {
-    const blogToUpdate = {
+    handleUpdateBlog({
       ...blog,
       user: blog.user.id,
       likes: blog.likes + 1,
-    }
-
-    handleUpdateBlog(blogToUpdate)
+    })
   }
 
   return (
