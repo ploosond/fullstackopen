@@ -46,7 +46,7 @@ const App = () => {
       setErrorMessage(`wrong username or password`)
       setTimeout(() => {
         setErrorMessage(null)
-      }, 5000)
+      }, 3000)
     }
   }
 
@@ -57,20 +57,21 @@ const App = () => {
 
   const handleNewBlog = async (blogObject) => {
     try {
-      blogFormRef.current.toggleVisibility()
       const blog = await blogService.create(blogObject)
+
       setBlogs(blogs.concat(blog))
       setSuccessMessage(
         `a  new blog ${blogObject.title} by ${blogObject.author}`
       )
       setTimeout(() => {
         setSuccessMessage(null)
-      }, 5000)
+      }, 3000)
+      blogFormRef.current.toggleVisibility()
     } catch (exception) {
       setErrorMessage(`fail to add a  new blog`)
       setTimeout(() => {
         setErrorMessage(null)
-      }, 5000)
+      }, 3000)
       console.log(exception)
     }
   }
@@ -83,6 +84,19 @@ const App = () => {
       )
     } catch (exception) {
       console.log(exception)
+    }
+  }
+
+  const handleRemoveBlog = async (newObject) => {
+    if (
+      window.confirm(`Remove blog ${newObject.title} by ${newObject.author}`)
+    ) {
+      try {
+        await blogService.remove(newObject.id)
+        setBlogs(blogs.filter((blog) => blog.id !== newObject.id))
+      } catch (exception) {
+        console.log(exception)
+      }
     }
   }
 
@@ -131,7 +145,12 @@ const App = () => {
       {blogs
         .sort((a, b) => b.likes - a.likes)
         .map((blog) => (
-          <Blog key={blog.id} blog={blog} handleUpdateBlog={handleUpdateBlog} />
+          <Blog
+            key={blog.id}
+            blog={blog}
+            handleUpdateBlog={handleUpdateBlog}
+            handleRemoveBlog={handleRemoveBlog}
+          />
         ))}
     </div>
   )
