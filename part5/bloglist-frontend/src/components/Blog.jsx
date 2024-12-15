@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-const Blog = ({ blog }) => {
+const Blog = ({ blog, handleUpdateBlog }) => {
   const [blogView, setBlogView] = useState(false)
 
   const showWhenVisible = { display: blogView ? 'none' : '' }
@@ -18,6 +18,16 @@ const Blog = ({ blog }) => {
     setBlogView(!blogView)
   }
 
+  const handleLike = () => {
+    const blogToUpdate = {
+      ...blog,
+      user: blog.user.id,
+      likes: blog.likes + 1,
+    }
+
+    handleUpdateBlog(blogToUpdate)
+  }
+
   return (
     <div style={blogStyle}>
       <div style={showWhenVisible}>
@@ -27,7 +37,7 @@ const Blog = ({ blog }) => {
         {blog.title} {blog.author} <button onClick={toggleView}>hide</button>
         <p>{blog.url}</p>
         <p>
-          likes {blog.likes} <button>like</button>
+          likes {blog.likes} <button onClick={handleLike}>like</button>
         </p>
         <p>{blog.author}</p>
       </div>

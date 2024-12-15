@@ -46,9 +46,9 @@ blogsRouter.put('/:id', async (req, res) => {
   }
   const updatedBlog = await Blog.findByIdAndUpdate(req.params.id, blog, {
     new: true,
-  })
+  }).populate('user', { username: 1, name: 1 })
 
-  res.status(200).send(updatedBlog)
+  res.status(200).json(updatedBlog)
 })
 
 blogsRouter.delete('/:id', middleware.userExtractor, async (req, res) => {
