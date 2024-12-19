@@ -4,6 +4,7 @@ import Blog from './Blog'
 
 describe('<Blog />', () => {
   let container
+  const mockHandler = vi.fn()
 
   beforeEach(() => {
     const blog = {
@@ -15,7 +16,9 @@ describe('<Blog />', () => {
         name: 'Super User',
       },
     }
-    container = render(<Blog blog={blog} />).container
+    container = render(
+      <Blog blog={blog} handleUpdateBlog={mockHandler} />
+    ).container
   })
 
   test('render `title` and `author` without `url` and `likes` by default', () => {
@@ -33,5 +36,14 @@ describe('<Blog />', () => {
     const toggledDiv = container.querySelector('.toggledDiv')
     expect(defaultDiv).toHaveStyle('display : none')
     expect(toggledDiv).toHaveStyle('display : block')
+  })
+
+  test('twice `likes` button click ensures event handler received as a props twice', async () => {
+    const user = userEvent.setup()
+    const button = screen.getByText('like')
+    await user.click(button)
+    await user.click(button)
+
+    expect(mockHandler.mock.calls).toHaveLength(2)
   })
 })
