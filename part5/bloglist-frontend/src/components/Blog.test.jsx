@@ -4,7 +4,8 @@ import Blog from './Blog'
 
 describe('<Blog />', () => {
   let container
-  const mockHandler = vi.fn()
+  const mockHandlerLikeUpdate = vi.fn()
+  const mockHandlerBlogRemove = vi.fn()
 
   beforeEach(() => {
     const blog = {
@@ -17,7 +18,11 @@ describe('<Blog />', () => {
       },
     }
     container = render(
-      <Blog blog={blog} handleUpdateBlog={mockHandler} />
+      <Blog
+        blog={blog}
+        handleUpdateBlog={mockHandlerLikeUpdate}
+        handleRemoveBlog={mockHandlerBlogRemove}
+      />
     ).container
   })
 
@@ -44,6 +49,6 @@ describe('<Blog />', () => {
     await user.click(button)
     await user.click(button)
 
-    expect(mockHandler.mock.calls).toHaveLength(2)
+    expect(mockHandlerLikeUpdate.mock.calls).toHaveLength(2)
   })
 })
