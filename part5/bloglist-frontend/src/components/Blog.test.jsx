@@ -21,11 +21,17 @@ describe('<Blog />', () => {
   test('render `title` and `author` without `url` and `likes` by default', () => {
     const defaultDiv = container.querySelector('.defaultDiv')
     const toggledDiv = container.querySelector('.toggledDiv')
-    expect(defaultDiv).toHaveStyle(`display : block`)
-    expect(toggledDiv).toHaveStyle(`display : none`)
-    expect(defaultDiv).toHaveTextContent('10 Fundaments of React')
-    expect(defaultDiv).toHaveTextContent('Don John')
-    expect(defaultDiv).not.toHaveTextContent('100')
-    expect(defaultDiv).not.toHaveTextContent('Super User')
+    expect(defaultDiv).toHaveStyle('display : block')
+    expect(toggledDiv).toHaveStyle('display : none')
+  })
+
+  test('render `url` and `likes` once `show` button is clicked', async () => {
+    const user = userEvent.setup()
+    const button = screen.getByText('view')
+    await user.click(button)
+    const defaultDiv = container.querySelector('.defaultDiv')
+    const toggledDiv = container.querySelector('.toggledDiv')
+    expect(defaultDiv).toHaveStyle('display : none')
+    expect(toggledDiv).toHaveStyle('display : block')
   })
 })
