@@ -39,10 +39,10 @@ const Blog = ({ blog, handleUpdateBlog, handleRemoveBlog }) => {
 
   return (
     <div style={blogStyle}>
-      <div style={showWhenVisible}>
+      <div style={showWhenVisible} className="defaultDiv">
         {blog.title} {blog.author} <button onClick={toggleView}>view</button>
       </div>
-      <div style={hideWhenVisible}>
+      <div style={hideWhenVisible} className="toggledDiv">
         {blog.title} {blog.author} <button onClick={toggleView}>hide</button>
         <p>{blog.url}</p>
         <p>
