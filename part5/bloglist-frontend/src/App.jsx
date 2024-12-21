@@ -148,6 +148,7 @@ const App = () => {
         .sort((a, b) => b.likes - a.likes)
         .map((blog) => (
           <Blog
+            user={user}
             key={blog.id}
             blog={blog}
             handleUpdateBlog={handleUpdateBlog}

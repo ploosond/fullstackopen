@@ -7,8 +7,8 @@ describe('Blog app', () => {
     await request.post('/api/testing/reset')
     await request.post('/api/users', {
       data: {
-        name: 'Prajwol Devkota',
-        username: 'ploosond',
+        name: 'Super User',
+        username: 'root',
         password: 'apple',
       },
     })
@@ -24,12 +24,12 @@ describe('Blog app', () => {
 
   describe('Login', () => {
     test('succeeds with correct credentials', async ({ page }) => {
-      await loginWith(page, 'ploosond', 'apple')
-      await expect(page.getByText('Prajwol Devkota logged in')).toBeVisible()
+      await loginWith(page, 'root', 'apple')
+      await expect(page.getByText('Super User logged in')).toBeVisible()
     })
 
     test('fails with wrong credentials', async ({ page }) => {
-      await loginWith(page, 'ploosond', 'ball')
+      await loginWith(page, 'root', 'ball')
       const errorDiv = await page.locator('.error')
       await expect(errorDiv).toContainText('wrong username or password')
       await expect(errorDiv).toHaveCSS('border-style', 'solid')
@@ -38,7 +38,7 @@ describe('Blog app', () => {
 
     describe('When logged in', () => {
       beforeEach(async ({ page }) => {
-        await loginWith(page, 'ploosond', 'apple')
+        await loginWith(page, 'root', 'apple')
       })
 
       test('a new blog can be created', async ({ page }) => {
@@ -56,12 +56,18 @@ describe('Blog app', () => {
 
       describe('When a blog is created', () => {
         beforeEach(async ({ page }) => {
-          const blog = {
-            title: '101 React hooks',
+          const blog1 = {
+            title: 'Blog1 By Super User',
             author: 'Don Joe',
             url: 'https://example101.react',
           }
-          await createBlog(page, blog.title, blog.author, blog.url)
+          // const blog2 = {
+          //   title: 'Blog2 By Super User',
+          //   author: 'Don Joe',
+          //   url: 'https://example101.react',
+          // }
+          await createBlog(page, blog1.title, blog1.author, blog1.url)
+          // await createBlog(page, blog2.title, blog2.author, blog2.url)
         })
 
         test('and a blog can be liked', async ({ page }) => {
@@ -72,7 +78,7 @@ describe('Blog app', () => {
 
         test('and user who added blog can delete it', async ({ page }) => {
           await expect(
-            page.getByText('101 React hooks Don Joe view')
+            page.getByText('Blog1 By Super User Don Joe view')
           ).toBeVisible()
           await page.getByRole('button', { name: 'view' }).click()
           await expect(
@@ -81,7 +87,51 @@ describe('Blog app', () => {
           page.on('dialog', (dialog) => dialog.accept())
           await page.getByRole('button', { name: 'remove' }).click()
           await expect(
-            page.getByText('101 React hooks Don Joe view')
+            page.getByText('Blog1 By Super User Don Joe view')
+          ).not.toBeVisible()
+        })
+
+        test('and only user who added blog sees delete button', async ({
+          page,
+          request,
+        }) => {
+          await request.post('/api/users', {
+            data: {
+              name: 'Prajwol Devkota',
+              username: 'ploosond',
+              password: 'apple',
+            },
+          })
+
+          await page.getByRole('button', { name: 'logout' }).click()
+          await loginWith(page, 'ploosond', 'apple')
+          const blog3 = {
+            title: 'Blog2 By Prajwol Devkota',
+            author: 'Don Joe',
+            url: 'https://example101.react',
+          }
+
+          await createBlog(page, blog3.title, blog3.author, blog3.url)
+          const blogByPloosondText = await page.getByText(
+            'Blog2 By Prajwol Devkota Don Joe view'
+          )
+
+          const blogByPloosondElement = await blogByPloosondText.locator('..')
+          await blogByPloosondElement
+            .getByRole('button', { name: 'view' })
+            .click()
+          await expect(
+            blogByPloosondElement.getByRole('button', { name: 'remove' })
+          ).toBeVisible()
+
+          const blogByRootText = await page.getByText(
+            'Blog1 By Super User Don Joe view'
+          )
+
+          const blogByRootElement = await blogByRootText.locator('..')
+          await blogByRootElement.getByRole('button', { name: 'view' }).click()
+          await expect(
+            blogByRootElement.getByRole('button', { name: 'remove' })
           ).not.toBeVisible()
         })
       })
