@@ -60,6 +60,9 @@ blogsRouter.delete('/:id', middleware.userExtractor, async (req, res) => {
     res.status(401).json({ error: 'invalid token' })
   }
 
+  console.log(blog.user.toString())
+  console.log(user.id)
+
   if (blog.user.toString() !== user.id) {
     return res
       .status(401)
