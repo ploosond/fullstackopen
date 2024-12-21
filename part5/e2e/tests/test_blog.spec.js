@@ -4,8 +4,8 @@ const { title } = require('process')
 
 describe('Blog app', () => {
   beforeEach(async ({ page, request }) => {
-    // await request.post('http://localhost:3003/api/testing/reset')
-    await request.post('http://localhost:3003/api/users', {
+    await request.post('/api/testing/reset')
+    await request.post('/api/users', {
       data: {
         name: 'Prajwol Devkota',
         username: 'ploosond',
@@ -13,7 +13,7 @@ describe('Blog app', () => {
       },
     })
 
-    await page.goto('http://localhost:5173')
+    await page.goto('/')
   })
 
   test('Login form is shown', async ({ page }) => {
@@ -52,6 +52,23 @@ describe('Blog app', () => {
         await expect(
           page.getByText(`a  new blog ${blog.title} by ${blog.author}`)
         ).toBeVisible()
+      })
+
+      describe('When a blog is created', () => {
+        beforeEach(async ({ page }) => {
+          const blog = {
+            title: '101 React hooks',
+            author: 'Don Joe',
+            url: 'https://example101.react',
+          }
+          await createBlog(page, blog.title, blog.author, blog.url)
+        })
+
+        test('and a blog can be liked', async ({ page }) => {
+          await page.getByRole('button', { name: 'view' }).click()
+          await page.getByRole('button', { name: 'like' }).click()
+          await expect(page.getByText('likes 1')).toBeVisible()
+        })
       })
     })
   })
