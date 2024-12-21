@@ -26,10 +26,10 @@ const userExtractor = async (req, res, next) => {
 }
 
 const requestLogger = (req, res, next) => {
-  logger.info('Method:', req.method)
-  logger.info('Path:', req.path)
-  logger.info('Body:', req.body)
-  logger.info('---')
+  console.log('Method:', req.method)
+  console.log('Path:  ', req.path)
+  console.log('Body:  ', req.body)
+  console.log('---')
   next()
 }
 
