@@ -7,29 +7,29 @@ import reducer from './reducer'
 const store = createStore(reducer)
 
 const App = () => {
-  // const good = () => {
-  //   store.dispatch({
-  //     type: 'GOOD'
-  //   })
-  // }
+  const good = () => {
+    store.dispatch({
+      type: 'GOOD'
+    })
+  }
 
-  // const ok = () => {
-  //   store.dispatch({
-  //     type: 'OK'
-  //   })
-  // }
+  const ok = () => {
+    store.dispatch({
+      type: 'OK'
+    })
+  }
 
-  // const bad = () => {
-  //   store.dispatch({
-  //     type: 'BAD'
-  //   })
-  // }
+  const bad = () => {
+    store.dispatch({
+      type: 'BAD'
+    })
+  }
 
-  // const reset = () => {
-  //   store.dispatch({
-  //     type:'ZERO'
-  //   })
-  // }
+  const reset = () => {
+    store.dispatch({
+      type:'ZERO'
+    })
+  }
 
   return (
     <div>
