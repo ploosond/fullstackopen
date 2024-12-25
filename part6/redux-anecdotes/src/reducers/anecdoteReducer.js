@@ -46,4 +46,13 @@ const reducer = (state = initialState, action) => {
   }
 }
 
+export const createAnecdote = (anecdote) => {
+  return {
+    type: 'NEW_ANECDOTE',
+    payload: {
+      anecdote: anecdote,
+    },
+  }
+}
+
 export default reducer
