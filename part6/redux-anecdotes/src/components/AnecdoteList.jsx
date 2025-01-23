@@ -1,27 +1,27 @@
-import React from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { voteOf } from '../reducers/anecdoteReducer'
+import React from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { voteOf } from "../reducers/anecdoteReducer";
 
 const AnecdoteList = () => {
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
 
   const anecdotes = useSelector((state) => {
-    if (state.filter !== '') {
+    if (state.filter !== "") {
       return state.anecdotes.filter((anecdote) =>
         anecdote.content.toLowerCase().includes(state.filter.toLowerCase())
-      )
+      );
     }
-    return state.anecdotes
-  })
+    return state.anecdotes;
+  });
 
   const vote = (id) => {
-    console.log('vote', id)
-    dispatch(voteOf(id))
-  }
+    console.log("vote", id);
+    dispatch(voteOf(id));
+  };
 
   return (
     <div>
-      {anecdotes
+      {[...anecdotes]
         .sort((a, b) => b.votes - a.votes)
         .map((anecdote) => (
           <div key={anecdote.id}>
@@ -33,7 +33,7 @@ const AnecdoteList = () => {
           </div>
         ))}
     </div>
-  )
-}
+  );
+};
 
-export default AnecdoteList
+export default AnecdoteList;
