@@ -12,6 +12,9 @@ const AnecdoteForm = () => {
       const anecdotes = queryClient.getQueryData(["anecdotes"]);
       queryClient.setQueryData(["anecdotes"], anecdotes.concat(newAnecdote));
     },
+    onError: (failedAnecdote) => {
+      dispatch({ type: "create", payload: failedAnecdote.response.data.error });
+    },
   });
 
   const onCreate = (event) => {
