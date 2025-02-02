@@ -95,6 +95,12 @@ const CreateNew = ({ addNew, setNotification }) => {
   const info = useField("text");
   const navigate = useNavigate();
 
+  const handleClick = () => {
+    content.reset();
+    author.reset();
+    info.reset();
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     addNew({
@@ -118,6 +124,7 @@ const CreateNew = ({ addNew, setNotification }) => {
           content
           <input
             name="content"
+            type={content.type}
             value={content.value}
             onChange={content.onChange}
           />
@@ -126,21 +133,22 @@ const CreateNew = ({ addNew, setNotification }) => {
           author
           <input
             name="author"
+            type={content.type}
             value={author.value}
             onChange={author.onChange}
           />
         </div>
         <div>
           url for more info
-          <input name="info" value={info.value} onChange={info.onChange} />
+          <input
+            name="info"
+            type={content.type}
+            value={info.value}
+            onChange={info.onChange}
+          />
         </div>
         <button type="submit">create</button>
-        <button
-          type="button"
-          onClick={() => {
-            content.reset(), author.reset(), info.reset();
-          }}
-        >
+        <button type="button" onClick={handleClick}>
           reset
         </button>
       </form>
