@@ -7,7 +7,12 @@ import Togglable from './components/Togglable';
 import './App.css';
 import { useSelector, useDispatch } from 'react-redux';
 import { createNotification } from './reducers/notificationsReducer';
-import { createBlog, initializeBlogs } from './reducers/blogsReducer';
+import {
+  createBlog,
+  initializeBlogs,
+  updateLikes,
+  deleteBlog,
+} from './reducers/blogsReducer';
 import { username, password, reset } from './reducers/loginReducer';
 import { setUser, clearUser } from './reducers/userReducer';
 
@@ -87,10 +92,7 @@ const App = () => {
 
   const handleUpdateBlog = async (newObject) => {
     try {
-      const updatedBlog = await blogService.update(newObject.id, newObject);
-      setBlogs(
-        blogs.map((blog) => (blog.id === newObject.id ? updatedBlog : blog))
-      );
+      await dispatch(updateLikes(newObject));
     } catch (exception) {
       console.log(exception);
     }
@@ -101,8 +103,7 @@ const App = () => {
       window.confirm(`Remove blog ${newObject.title} by ${newObject.author}`)
     ) {
       try {
-        await blogService.remove(newObject.id);
-        setBlogs(blogs.filter((blog) => blog.id !== newObject.id));
+        dispatch(deleteBlog(newObject));
       } catch (exception) {
         console.log(exception);
       }
