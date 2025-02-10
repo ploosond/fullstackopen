@@ -4,30 +4,31 @@ import blogService from './services/blogs';
 import loginService from './services/login';
 import BlogForm from './components/BlogForm';
 import Togglable from './components/Togglable';
-import { useSelector, useDispatch } from 'react-redux';
-import { createNotification } from './reducers/notificationReducer';
 import './App.css';
+import { useSelector, useDispatch } from 'react-redux';
+import { createNotification } from './reducers/notificationsReducer';
+import { createBlog, initializeBlogs } from './reducers/blogsReducer';
+import { username, password, reset } from './reducers/loginReducer';
+import { setUser, clearUser } from './reducers/userReducer';
 
 const App = () => {
-  const [blogs, setBlogs] = useState([]);
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [user, setUser] = useState(null);
-
   const dispatch = useDispatch();
+  const blogs = useSelector((state) => state.blogs);
+  const login = useSelector((state) => state.login);
+  const user = useSelector((state) => state.user);
   const notification = useSelector((state) => state.notification);
 
   const blogFormRef = useRef();
 
   useEffect(() => {
-    blogService.getAll().then((blogs) => setBlogs(blogs));
-  }, []);
+    dispatch(initializeBlogs());
+  }, [dispatch]);
 
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem('loggedBlogappUser');
     if (loggedUserJSON) {
       const user = JSON.parse(loggedUserJSON);
-      setUser(user);
+      dispatch(setUser(user));
       blogService.setToken(user.token);
     }
   }, []);
@@ -35,13 +36,12 @@ const App = () => {
   const handleLogin = async (event) => {
     event.preventDefault();
     try {
-      const user = await loginService.login({ username, password });
+      const user = await loginService.login(login);
       window.localStorage.setItem('loggedBlogappUser', JSON.stringify(user));
 
       blogService.setToken(user.token);
-      setUser(user);
-      setUsername('');
-      setPassword('');
+      dispatch(setUser(user));
+      dispatch(reset());
     } catch (exception) {
       dispatch(
         createNotification(
@@ -57,14 +57,13 @@ const App = () => {
 
   const handleLogout = () => {
     window.localStorage.removeItem('loggedBlogappUser');
-    setUser(null);
+    dispatch(clearUser());
   };
 
   const handleNewBlog = async (blogObject) => {
     try {
-      const blog = await blogService.create(blogObject);
+      await dispatch(createBlog(blogObject));
 
-      setBlogs(blogs.concat(blog));
       dispatch(
         createNotification(
           {
@@ -124,8 +123,8 @@ const App = () => {
               data-testid="username"
               type="text"
               name="Username"
-              value={username}
-              onChange={({ target }) => setUsername(target.value)}
+              value={login.username}
+              onChange={(e) => dispatch(username(e.target.value))}
             />
           </div>
           <div>
@@ -134,8 +133,8 @@ const App = () => {
               data-testid="password"
               type="text"
               name="Password"
-              value={password}
-              onChange={({ target }) => setPassword(target.value)}
+              value={login.password}
+              onChange={(e) => dispatch(password(e.target.value))}
             />
           </div>
           <button type="submit">login</button>
@@ -160,7 +159,7 @@ const App = () => {
       <Togglable buttonLabel="create new blog" ref={blogFormRef}>
         <BlogForm handleNewBlog={handleNewBlog} />
       </Togglable>
-      {blogs
+      {[...blogs]
         .sort((a, b) => b.likes - a.likes)
         .map((blog) => (
           <Blog
