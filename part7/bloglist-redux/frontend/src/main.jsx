@@ -4,7 +4,9 @@ import store from './store';
 import App from './App';
 import { current } from '@reduxjs/toolkit';
 
-console.log(store.getState());
+store.subscribe(() => {
+  console.log(store.getState());
+});
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <Provider store={store}>
