@@ -1,110 +1,121 @@
-import { useState, useEffect, useRef } from 'react'
-import Blog from './components/Blog'
-import blogService from './services/blogs'
-import loginService from './services/login'
-import BlogForm from './components/BlogForm'
-import Togglable from './components/Togglable'
-
-import './App.css'
+import { useState, useEffect, useRef, useContext } from 'react';
+import Blog from './components/Blog';
+import blogService from './services/blogs';
+import loginService from './services/login';
+import BlogForm from './components/BlogForm';
+import Togglable from './components/Togglable';
+import './App.css';
+import AppContext from './context/AppContext';
 
 const App = () => {
-  const [blogs, setBlogs] = useState([])
-  const [username, setUsername] = useState('')
-  const [password, setPassword] = useState('')
-  const [user, setUser] = useState(null)
+  const [blogs, setBlogs] = useState([]);
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [user, setUser] = useState(null);
 
-  const [successMessage, setSuccessMessage] = useState(null)
-  const [errorMessage, setErrorMessage] = useState(null)
+  const [notification, notificationDispatch] = useContext(AppContext);
 
-  const blogFormRef = useRef()
-
-  useEffect(() => {
-    blogService.getAll().then((blogs) => setBlogs(blogs))
-  }, [])
+  const blogFormRef = useRef();
 
   useEffect(() => {
-    const loggedUserJSON = window.localStorage.getItem('loggedBlogappUser')
+    blogService.getAll().then((blogs) => setBlogs(blogs));
+  }, []);
+
+  useEffect(() => {
+    const loggedUserJSON = window.localStorage.getItem('loggedBlogappUser');
     if (loggedUserJSON) {
-      const user = JSON.parse(loggedUserJSON)
-      setUser(user)
-      blogService.setToken(user.token)
+      const user = JSON.parse(loggedUserJSON);
+      setUser(user);
+      blogService.setToken(user.token);
     }
-  }, [])
+  }, []);
 
   const handleLogin = async (event) => {
-    event.preventDefault()
+    event.preventDefault();
     try {
-      const user = await loginService.login({ username, password })
-      window.localStorage.setItem('loggedBlogappUser', JSON.stringify(user))
+      const user = await loginService.login({ username, password });
+      window.localStorage.setItem('loggedBlogappUser', JSON.stringify(user));
 
-      blogService.setToken(user.token)
-      setUser(user)
-      setUsername('')
-      setPassword('')
+      blogService.setToken(user.token);
+      setUser(user);
+      setUsername('');
+      setPassword('');
     } catch (exception) {
-      console.log(exception)
-      setErrorMessage('wrong username or password')
+      console.log(exception);
+      notificationDispatch({
+        type: 'SET',
+        payload: { message: 'wrong username or password', type: 'error' },
+      });
       setTimeout(() => {
-        setErrorMessage(null)
-      }, 3000)
+        notificationDispatch({ type: 'CLEAR' });
+      }, 3000);
     }
-  }
+  };
 
   const handleLogout = () => {
-    window.localStorage.removeItem('loggedBlogappUser')
-    setUser(null)
-  }
+    window.localStorage.removeItem('loggedBlogappUser');
+    setUser(null);
+  };
 
   const handleNewBlog = async (blogObject) => {
     try {
-      const blog = await blogService.create(blogObject)
+      const blog = await blogService.create(blogObject);
 
-      setBlogs(blogs.concat(blog))
-      setSuccessMessage(
-        `a  new blog ${blogObject.title} by ${blogObject.author}`
-      )
+      setBlogs(blogs.concat(blog));
+      notificationDispatch({
+        type: 'SET',
+        payload: {
+          message: `a  new blog ${blogObject.title} by ${blogObject.author}`,
+          type: 'success',
+        },
+      });
       setTimeout(() => {
-        setSuccessMessage(null)
-      }, 3000)
-      blogFormRef.current.toggleVisibility()
+        notificationDispatch({ type: 'CLEAR' });
+      }, 3000);
+      blogFormRef.current.toggleVisibility();
     } catch (exception) {
-      setErrorMessage('fail to add a  new blog')
+      notificationDispatch({
+        type: 'SET',
+        payload: { message: 'fail to add a  new blog', type: 'error' },
+      });
       setTimeout(() => {
-        setErrorMessage(null)
-      }, 3000)
-      console.log(exception)
+        notificationDispatch({ type: 'CLEAR' });
+      }, 3000);
+      console.log(exception);
     }
-  }
+  };
 
   const handleUpdateBlog = async (newObject) => {
     try {
-      const updatedBlog = await blogService.update(newObject.id, newObject)
+      const updatedBlog = await blogService.update(newObject.id, newObject);
       setBlogs(
         blogs.map((blog) => (blog.id === newObject.id ? updatedBlog : blog))
-      )
+      );
     } catch (exception) {
-      console.log(exception)
+      console.log(exception);
     }
-  }
+  };
 
   const handleRemoveBlog = async (newObject) => {
     if (
       window.confirm(`Remove blog ${newObject.title} by ${newObject.author}`)
     ) {
       try {
-        await blogService.remove(newObject.id)
-        setBlogs(blogs.filter((blog) => blog.id !== newObject.id))
+        await blogService.remove(newObject.id);
+        setBlogs(blogs.filter((blog) => blog.id !== newObject.id));
       } catch (exception) {
-        console.log(exception)
+        console.log(exception);
       }
     }
-  }
+  };
 
   if (user === null) {
     return (
       <div>
         <h2>Log in to application</h2>
-        {errorMessage && <p className="error">{errorMessage}</p>}
+        {notification.type === 'error' && (
+          <p className="error">{notification.message}</p>
+        )}
         <form onSubmit={handleLogin}>
           <div>
             username
@@ -129,14 +140,18 @@ const App = () => {
           <button type="submit">login</button>
         </form>
       </div>
-    )
+    );
   }
 
   return (
     <div>
       <h2>blogs</h2>
-      {successMessage && <p className="success">{successMessage}</p>}
-      {errorMessage && <p className="error">{errorMessage}</p>}
+      {notification.type === 'success' && (
+        <p className="success">{notification.message}</p>
+      )}
+      {notification.type === 'error' && (
+        <p className="error">{notification.message}</p>
+      )}
       <p>
         {user.name} logged in
         <button onClick={handleLogout}>logout</button>
@@ -156,7 +171,7 @@ const App = () => {
           />
         ))}
     </div>
-  )
-}
+  );
+};
 
-export default App
+export default App;
