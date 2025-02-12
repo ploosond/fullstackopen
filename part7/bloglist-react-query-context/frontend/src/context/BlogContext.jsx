@@ -1,4 +1,4 @@
-import { createContext, useReducer } from 'react';
+import { createContext, useContext, useReducer } from 'react';
 
 const BlogContext = createContext();
 
@@ -17,12 +17,23 @@ const blogReducer = (state, action) => {
   }
 };
 
+export const useBlogValue = () => {
+  const blogAndDispatch = useContext(BlogContext);
+  return blogAndDispatch[0];
+};
+
+export const useBlogDispatch = () => {
+  const blogAndDispatch = useContext(BlogContext);
+  return blogAndDispatch[1];
+};
+
 export const BlogProvider = ({ children }) => {
   const [blog, blogDispatch] = useReducer(blogReducer, {
     title: '',
     author: '',
     url: '',
   });
+
   return (
     <BlogContext.Provider value={[blog, blogDispatch]}>
       {children}

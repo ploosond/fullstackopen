@@ -2,77 +2,28 @@ import { useEffect, useRef, useContext } from 'react';
 import Blog from './components/Blog';
 import BlogForm from './components/BlogForm';
 import Togglable from './components/Togglable';
-import LoginContext from './context/LoginContext';
-import UserContext from './context/UserContext';
-import NotificationContext from './context/NotificationContext';
+import { useLoginDispatch, useLoginValue } from './context/LoginContext';
+import UserContext, {
+  useUserDispatch,
+  useUserValue,
+} from './context/UserContext';
+import NotificationContext, {
+  useNotificationDispatch,
+  useNotificationValue,
+} from './context/NotificationContext';
 import { userLogin } from './services/login';
 import { setToken, getAll, create, update, remove } from './services/blogs';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { getUsers } from './services/users';
 import './App.css';
 
-const App = () => {
-  const [user, userDispatch] = useContext(UserContext);
-  const [notification, notificationDispatch] = useContext(NotificationContext);
-  const [login, loginDispatch] = useContext(LoginContext);
-
-  const blogFormRef = useRef();
-
-  const queryClient = useQueryClient();
-  const { isLoading, error, data } = useQuery({
-    queryKey: ['blogs'],
-    queryFn: getAll,
-    initialData: [],
-  });
-
-  const blogs = data;
-
-  const newBlogMutation = useMutation({
-    mutationFn: create,
-    onSuccess: (newblog) => {
-      const oldBlogs = queryClient.getQueryData(['blogs']);
-      queryClient.setQueryData(['blogs'], oldBlogs.concat(newblog));
-    },
-    onError: () => {
-      notificationDispatch({
-        type: 'SET',
-        payload: { message: 'fail to add a  new blog', type: 'error' },
-      });
-      setTimeout(() => {
-        notificationDispatch({ type: 'CLEAR' });
-      }, 3000);
-    },
-  });
-
-  const updateBlogMutation = useMutation({
-    mutationFn: update,
-    onSuccess: (updatedBlog) => {
-      const blogs = queryClient.getQueryData(['blogs']);
-      queryClient.setQueryData(
-        ['blogs'],
-        blogs.map((blog) => (blog.id !== updatedBlog.id ? blog : updatedBlog))
-      );
-    },
-  });
-
-  const deleteBlogMutation = useMutation({
-    mutationFn: remove,
-    onSuccess: (deletedBlog) => {
-      const oldBlogs = queryClient.getQueryData(['blogs']);
-      queryClient.setQueryData(
-        ['blogs'],
-        oldBlogs.filter((b) => b.id !== deletedBlog.id)
-      );
-    },
-  });
-
-  useEffect(() => {
-    const loggedUserJSON = window.localStorage.getItem('loggedBlogappUser');
-    if (loggedUserJSON) {
-      const user = JSON.parse(loggedUserJSON);
-      userDispatch({ type: 'SET', payload: user });
-      setToken(user.token);
-    }
-  }, [userDispatch]);
+const LoginForm = () => {
+  const notification = useNotificationValue();
+  const notificationDispatch = useNotificationDispatch();
+  const login = useLoginValue();
+  const loginDispatch = useLoginDispatch();
+  const user = useUserValue();
+  const userDispatch = useUserDispatch();
 
   const handleLogin = async (event) => {
     event.preventDefault();
@@ -95,30 +46,81 @@ const App = () => {
     }
   };
 
-  const handleLogout = () => {
-    window.localStorage.removeItem('loggedBlogappUser');
-    userDispatch({ type: 'REMOVE' });
-  };
+  return (
+    <div>
+      <h2>Log in to application</h2>
+      {notification?.type === 'error' && (
+        <p className="error">{notification?.message}</p>
+      )}
+      <form onSubmit={handleLogin}>
+        <div>
+          username
+          <input
+            data-testid="username"
+            type="text"
+            name="Username"
+            value={login.username}
+            onChange={(e) =>
+              loginDispatch({
+                type: 'SET',
+                payload: { ...login, username: e.target.value },
+              })
+            }
+          />
+        </div>
+        <div>
+          password
+          <input
+            data-testid="password"
+            type="text"
+            name="Password"
+            value={login.password}
+            onChange={(e) =>
+              loginDispatch({
+                type: 'SET',
+                payload: { ...login, password: e.target.value },
+              })
+            }
+          />
+        </div>
+        <button type="submit">login</button>
+      </form>
+    </div>
+  );
+};
 
-  const handleNewBlog = async (blogObject) => {
-    try {
-      await newBlogMutation.mutate(blogObject);
+const Blogs = () => {
+  const user = useUserValue();
+  const { isLoading, error, data } = useQuery({
+    queryKey: ['blogs'],
+    queryFn: getAll,
+    initialData: [],
+  });
 
-      notificationDispatch({
-        type: 'SET',
-        payload: {
-          message: `a  new blog ${blogObject.title} by ${blogObject.author}`,
-          type: 'success',
-        },
-      });
-      setTimeout(() => {
-        notificationDispatch({ type: 'CLEAR' });
-      }, 3000);
-      blogFormRef.current.toggleVisibility();
-    } catch (exception) {
-      console.log(exception);
-    }
-  };
+  const blogs = data;
+
+  const queryClient = useQueryClient();
+  const updateBlogMutation = useMutation({
+    mutationFn: update,
+    onSuccess: (updatedBlog) => {
+      const blogs = queryClient.getQueryData(['blogs']);
+      queryClient.setQueryData(
+        ['blogs'],
+        blogs.map((blog) => (blog.id !== updatedBlog.id ? blog : updatedBlog))
+      );
+    },
+  });
+
+  const deleteBlogMutation = useMutation({
+    mutationFn: remove,
+    onSuccess: (deletedBlog) => {
+      const oldBlogs = queryClient.getQueryData(['blogs']);
+      queryClient.setQueryData(
+        ['blogs'],
+        oldBlogs.filter((b) => b.id !== deletedBlog.id)
+      );
+    },
+  });
 
   const handleUpdateBlog = async (newObject) => {
     try {
@@ -147,67 +149,8 @@ const App = () => {
   if (error) {
     return <div>service not available due to problems in server</div>;
   }
-
-  if (user === null) {
-    return (
-      <div>
-        <h2>Log in to application</h2>
-        {notification?.type === 'error' && (
-          <p className="error">{notification?.message}</p>
-        )}
-        <form onSubmit={handleLogin}>
-          <div>
-            username
-            <input
-              data-testid="username"
-              type="text"
-              name="Username"
-              value={login.username}
-              onChange={(e) =>
-                loginDispatch({
-                  type: 'SET',
-                  payload: { ...login, username: e.target.value },
-                })
-              }
-            />
-          </div>
-          <div>
-            password
-            <input
-              data-testid="password"
-              type="text"
-              name="Password"
-              value={login.password}
-              onChange={(e) =>
-                loginDispatch({
-                  type: 'SET',
-                  payload: { ...login, password: e.target.value },
-                })
-              }
-            />
-          </div>
-          <button type="submit">login</button>
-        </form>
-      </div>
-    );
-  }
-
   return (
     <div>
-      <h2>blogs</h2>
-      {notification?.type === 'success' && (
-        <p className="success">{notification?.message}</p>
-      )}
-      {notification?.type === 'error' && (
-        <p className="error">{notification?.message}</p>
-      )}
-      <p>
-        {user.name} logged in
-        <button onClick={handleLogout}>logout</button>
-      </p>
-      <Togglable buttonLabel="create new blog" ref={blogFormRef}>
-        <BlogForm handleNewBlog={handleNewBlog} />
-      </Togglable>
       {blogs
         .sort((a, b) => b.likes - a.likes)
         .map((blog) => (
@@ -219,6 +162,133 @@ const App = () => {
             handleRemoveBlog={handleRemoveBlog}
           />
         ))}
+    </div>
+  );
+};
+
+const Notification = () => {
+  const notification = useNotificationValue();
+  return (
+    <div>
+      {notification?.type === 'success' && (
+        <p className="success">{notification?.message}</p>
+      )}
+      {notification?.type === 'error' && (
+        <p className="error">{notification?.message}</p>
+      )}
+    </div>
+  );
+};
+
+const User = () => {
+  const user = useUserValue();
+  const userDispatch = useUserDispatch();
+  const { data } = useQuery({
+    queryKey: ['users'],
+    queryFn: getUsers,
+    initialData: [],
+  });
+
+  const users = data;
+
+  const handleLogout = () => {
+    window.localStorage.removeItem('loggedBlogappUser');
+    userDispatch({ type: 'REMOVE' });
+  };
+
+  useEffect(() => {
+    const loggedUserJSON = window.localStorage.getItem('loggedBlogappUser');
+    if (loggedUserJSON) {
+      const user = JSON.parse(loggedUserJSON);
+      userDispatch({ type: 'SET', payload: user });
+      setToken(user.token);
+    }
+  }, [userDispatch]);
+
+  return (
+    <div>
+      <h2>blogs</h2>
+      <p>{user.name} logged in</p>
+      <button onClick={handleLogout}>logout</button>
+      <h2>Users</h2>
+      <table>
+        <thead>
+          <tr>
+            <th></th>
+            <th>blogs created</th>
+          </tr>
+        </thead>
+        {users.map((user) => (
+          <tbody key={user.id}>
+            <tr>
+              <td>{user.name}</td>
+              <td>{user.blogs.length}</td>
+            </tr>
+          </tbody>
+        ))}
+      </table>
+    </div>
+  );
+};
+
+const App = () => {
+  const user = useUserValue();
+  const userDispatch = useUserDispatch();
+  const notificationDispatch = useNotificationDispatch();
+
+  const blogFormRef = useRef();
+
+  const queryClient = useQueryClient();
+
+  const newBlogMutation = useMutation({
+    mutationFn: create,
+    onSuccess: (newblog) => {
+      const oldBlogs = queryClient.getQueryData(['blogs']);
+      queryClient.setQueryData(['blogs'], oldBlogs.concat(newblog));
+    },
+    onError: () => {
+      notificationDispatch({
+        type: 'SET',
+        payload: { message: 'fail to add a  new blog', type: 'error' },
+      });
+      setTimeout(() => {
+        notificationDispatch({ type: 'CLEAR' });
+      }, 3000);
+    },
+  });
+
+  const handleNewBlog = async (blogObject) => {
+    try {
+      await newBlogMutation.mutate(blogObject);
+
+      notificationDispatch({
+        type: 'SET',
+        payload: {
+          message: `a  new blog ${blogObject.title} by ${blogObject.author}`,
+          type: 'success',
+        },
+      });
+      setTimeout(() => {
+        notificationDispatch({ type: 'CLEAR' });
+      }, 3000);
+      blogFormRef.current.toggleVisibility();
+    } catch (exception) {
+      console.log(exception);
+    }
+  };
+
+  if (user === null) {
+    return <LoginForm />;
+  }
+
+  return (
+    <div>
+      <Notification />
+      <User />
+      <Togglable buttonLabel="create new blog" ref={blogFormRef}>
+        <BlogForm handleNewBlog={handleNewBlog} />
+      </Togglable>
+      <Blogs />
     </div>
   );
 };

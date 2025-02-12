@@ -1,7 +1,9 @@
 import { useState } from 'react';
+import { useQueryClient, useMutation } from '@tanstack/react-query';
+import { update, remove } from '../services/blogs';
 import PropTypes from 'prop-types';
 
-const Blog = ({ user, blog, handleUpdateBlog, handleRemoveBlog }) => {
+const Blog = ({ user, blog }) => {
   const [blogView, setBlogView] = useState(false);
 
   const showWhenVisible = { display: blogView ? 'none' : '' };
@@ -19,22 +21,54 @@ const Blog = ({ user, blog, handleUpdateBlog, handleRemoveBlog }) => {
     setBlogView(!blogView);
   };
 
-  const handleLike = () => {
-    handleUpdateBlog({
-      ...blog,
-      user: blog.user.id,
-      likes: blog.likes + 1,
-    });
+  const queryClient = useQueryClient();
+
+  const updateBlogMutation = useMutation({
+    mutationFn: update,
+    onSuccess: (updatedBlog) => {
+      const blogs = queryClient.getQueryData(['blogs']);
+      queryClient.setQueryData(
+        ['blogs'],
+        blogs.map((blog) => (blog.id !== updatedBlog.id ? blog : updatedBlog))
+      );
+    },
+  });
+
+  const deleteBlogMutation = useMutation({
+    mutationFn: remove,
+    onSuccess: (deletedBlog) => {
+      const oldBlogs = queryClient.getQueryData(['blogs']);
+      queryClient.setQueryData(
+        ['blogs'],
+        oldBlogs.filter((b) => b.id !== deletedBlog.id)
+      );
+    },
+  });
+
+  const handleLike = async () => {
+    try {
+      await updateBlogMutation.mutate({
+        ...blog,
+        user: blog.user.id,
+        likes: blog.likes + 1,
+      });
+    } catch (exception) {
+      console.log(exception);
+    }
   };
 
-  const handleRemove = () => {
-    handleRemoveBlog({ ...blog });
+  const handleRemove = async () => {
+    if (window.confirm(`Remove blog ${blog.title} by ${blog.author}`)) {
+      try {
+        await deleteBlogMutation.mutate(blog);
+      } catch (exception) {
+        console.log(exception);
+      }
+    }
   };
 
   Blog.propTypes = {
     blog: PropTypes.object.isRequired,
-    handleUpdateBlog: PropTypes.func.isRequired,
-    handleRemoveBlog: PropTypes.func.isRequired,
   };
 
   return (

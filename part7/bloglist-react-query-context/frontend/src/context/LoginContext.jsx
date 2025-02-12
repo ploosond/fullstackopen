@@ -1,4 +1,4 @@
-import { createContext, useReducer } from 'react';
+import { createContext, useContext, useReducer } from 'react';
 
 const LoginContext = createContext();
 
@@ -14,6 +14,16 @@ const loginReducer = (state, action) => {
     default:
       return state;
   }
+};
+
+export const useLoginValue = () => {
+  const loginAndDispatch = useContext(LoginContext);
+  return loginAndDispatch[0];
+};
+
+export const useLoginDispatch = () => {
+  const loginAndDispatch = useContext(LoginContext);
+  return loginAndDispatch[1];
 };
 
 export const LoginProvider = ({ children }) => {

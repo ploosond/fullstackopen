@@ -1,9 +1,9 @@
-import React, { useState, useContext } from 'react';
-import PropTypes from 'prop-types';
-import BlogContext from '../context/BlogContext';
+import { useContext } from 'react';
+import { useBlogDispatch, useBlogValue } from '../context/BlogContext';
 
 const BlogForm = ({ handleNewBlog }) => {
-  const [blog, blogDispatch] = useContext(BlogContext);
+  const blog = useBlogValue();
+  const blogDispatch = useBlogDispatch();
 
   const addBlog = (event) => {
     event.preventDefault();
@@ -11,9 +11,6 @@ const BlogForm = ({ handleNewBlog }) => {
     blogDispatch({ type: 'RESET' });
   };
 
-  BlogForm.propTypes = {
-    handleNewBlog: PropTypes.func.isRequired,
-  };
   return (
     <div>
       <h2>create new</h2>
