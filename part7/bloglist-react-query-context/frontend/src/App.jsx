@@ -9,9 +9,11 @@ import NotificationContext from './context/NotificationContext';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { getAll } from './services/blogs';
 import LoginContext from './context/LoginContext';
+import UserContext from './context/UserContext';
 
 const App = () => {
-  const [user, setUser] = useState(null);
+  const [user, userDispatch] = useContext(UserContext);
+  console.log(user);
 
   const [notification, notificationDispatch] = useContext(NotificationContext);
   const [login, loginDispatch] = useContext(LoginContext);
@@ -70,7 +72,7 @@ const App = () => {
     const loggedUserJSON = window.localStorage.getItem('loggedBlogappUser');
     if (loggedUserJSON) {
       const user = JSON.parse(loggedUserJSON);
-      setUser(user);
+      userDispatch({ type: 'SET', payload: user });
       blogService.setToken(user.token);
     }
   }, []);
@@ -82,7 +84,7 @@ const App = () => {
       window.localStorage.setItem('loggedBlogappUser', JSON.stringify(user));
 
       blogService.setToken(user.token);
-      setUser(user);
+      userDispatch({ type: 'SET', payload: user });
       loginDispatch({ type: 'RESET' });
     } catch (exception) {
       console.log(exception);
@@ -98,7 +100,7 @@ const App = () => {
 
   const handleLogout = () => {
     window.localStorage.removeItem('loggedBlogappUser');
-    setUser(null);
+    userDispatch({ type: 'REMOVE' });
   };
 
   const handleNewBlog = async (blogObject) => {
