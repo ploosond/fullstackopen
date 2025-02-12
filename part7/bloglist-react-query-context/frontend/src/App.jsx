@@ -1,32 +1,29 @@
-import { useState, useEffect, useRef, useContext } from 'react';
+import { useEffect, useRef, useContext } from 'react';
 import Blog from './components/Blog';
-import blogService, { create, remove, update } from './services/blogs';
-import loginService from './services/login';
 import BlogForm from './components/BlogForm';
 import Togglable from './components/Togglable';
-import './App.css';
-import NotificationContext from './context/NotificationContext';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { getAll } from './services/blogs';
 import LoginContext from './context/LoginContext';
 import UserContext from './context/UserContext';
+import NotificationContext from './context/NotificationContext';
+import { userLogin } from './services/login';
+import { setToken, getAll, create, update, remove } from './services/blogs';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import './App.css';
 
 const App = () => {
   const [user, userDispatch] = useContext(UserContext);
-  console.log(user);
-
   const [notification, notificationDispatch] = useContext(NotificationContext);
   const [login, loginDispatch] = useContext(LoginContext);
 
   const blogFormRef = useRef();
 
   const queryClient = useQueryClient();
-
   const { isLoading, error, data } = useQuery({
     queryKey: ['blogs'],
     queryFn: getAll,
     initialData: [],
   });
+
   const blogs = data;
 
   const newBlogMutation = useMutation({
@@ -73,17 +70,17 @@ const App = () => {
     if (loggedUserJSON) {
       const user = JSON.parse(loggedUserJSON);
       userDispatch({ type: 'SET', payload: user });
-      blogService.setToken(user.token);
+      setToken(user.token);
     }
-  }, []);
+  }, [userDispatch]);
 
   const handleLogin = async (event) => {
     event.preventDefault();
     try {
-      const user = await loginService.login(login);
+      const user = await userLogin(login);
       window.localStorage.setItem('loggedBlogappUser', JSON.stringify(user));
 
-      blogService.setToken(user.token);
+      setToken(user.token);
       userDispatch({ type: 'SET', payload: user });
       loginDispatch({ type: 'RESET' });
     } catch (exception) {

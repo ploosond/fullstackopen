@@ -3,7 +3,7 @@ const baseUrl = '/api/blogs';
 
 let token = null;
 
-const setToken = (newToken) => {
+export const setToken = (newToken) => {
   token = `Bearer ${newToken}`;
 };
 
@@ -37,5 +37,3 @@ export const remove = async (newObject) => {
   const response = await axios.delete(`${baseUrl}/${newObject.id}`, config);
   return response.data;
 };
-
-export default { setToken, getAll, create, update, remove };
