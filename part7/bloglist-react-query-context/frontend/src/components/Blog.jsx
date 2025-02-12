@@ -1,11 +1,11 @@
-import { useState } from 'react'
-import PropTypes from 'prop-types'
+import { useState } from 'react';
+import PropTypes from 'prop-types';
 
 const Blog = ({ user, blog, handleUpdateBlog, handleRemoveBlog }) => {
-  const [blogView, setBlogView] = useState(false)
+  const [blogView, setBlogView] = useState(false);
 
-  const showWhenVisible = { display: blogView ? 'none' : '' }
-  const hideWhenVisible = { display: blogView ? '' : 'none' }
+  const showWhenVisible = { display: blogView ? 'none' : '' };
+  const hideWhenVisible = { display: blogView ? '' : 'none' };
 
   const blogStyle = {
     paddingTop: 10,
@@ -13,29 +13,29 @@ const Blog = ({ user, blog, handleUpdateBlog, handleRemoveBlog }) => {
     border: 'solid',
     borderWidth: 1,
     marginBottom: 5,
-  }
+  };
 
   const toggleView = () => {
-    setBlogView(!blogView)
-  }
+    setBlogView(!blogView);
+  };
 
   const handleLike = () => {
     handleUpdateBlog({
       ...blog,
       user: blog.user.id,
       likes: blog.likes + 1,
-    })
-  }
+    });
+  };
 
   const handleRemove = () => {
-    handleRemoveBlog({ ...blog })
-  }
+    handleRemoveBlog({ ...blog });
+  };
 
   Blog.propTypes = {
     blog: PropTypes.object.isRequired,
     handleUpdateBlog: PropTypes.func.isRequired,
     handleRemoveBlog: PropTypes.func.isRequired,
-  }
+  };
 
   return (
     <div style={blogStyle}>
@@ -56,7 +56,7 @@ const Blog = ({ user, blog, handleUpdateBlog, handleRemoveBlog }) => {
         )}
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Blog
+export default Blog;

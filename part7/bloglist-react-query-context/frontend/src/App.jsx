@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useContext } from 'react';
 import Blog from './components/Blog';
-import blogService, { create } from './services/blogs';
+import blogService, { create, remove, update } from './services/blogs';
 import loginService from './services/login';
 import BlogForm from './components/BlogForm';
 import Togglable from './components/Togglable';
@@ -20,6 +20,13 @@ const App = () => {
 
   const queryClient = useQueryClient();
 
+  const { isLoading, error, data } = useQuery({
+    queryKey: ['blogs'],
+    queryFn: getAll,
+    initialData: [],
+  });
+  const blogs = data;
+
   const newBlogMutation = useMutation({
     mutationFn: create,
     onSuccess: (newblog) => {
@@ -37,11 +44,27 @@ const App = () => {
     },
   });
 
-  const { isLoading, error, data } = useQuery({
-    queryKey: ['blogs'],
-    queryFn: getAll,
+  const updateBlogMutation = useMutation({
+    mutationFn: update,
+    onSuccess: (updatedBlog) => {
+      const blogs = queryClient.getQueryData(['blogs']);
+      queryClient.setQueryData(
+        ['blogs'],
+        blogs.map((blog) => (blog.id !== updatedBlog.id ? blog : updatedBlog))
+      );
+    },
   });
-  const blogs = data;
+
+  const deleteBlogMutation = useMutation({
+    mutationFn: remove,
+    onSuccess: (deletedBlog) => {
+      const oldBlogs = queryClient.getQueryData(['blogs']);
+      queryClient.setQueryData(
+        ['blogs'],
+        oldBlogs.filter((b) => b.id !== deletedBlog.id)
+      );
+    },
+  });
 
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem('loggedBlogappUser');
@@ -100,10 +123,7 @@ const App = () => {
 
   const handleUpdateBlog = async (newObject) => {
     try {
-      const updatedBlog = await blogService.update(newObject);
-      setBlogs(
-        blogs.map((blog) => (blog.id === newObject.id ? updatedBlog : blog))
-      );
+      await updateBlogMutation.mutate(newObject);
     } catch (exception) {
       console.log(exception);
     }
@@ -114,8 +134,7 @@ const App = () => {
       window.confirm(`Remove blog ${newObject.title} by ${newObject.author}`)
     ) {
       try {
-        await blogService.remove(newObject.id);
-        setBlogs(blogs.filter((blog) => blog.id !== newObject.id));
+        await deleteBlogMutation.mutate(newObject);
       } catch (exception) {
         console.log(exception);
       }
@@ -190,18 +209,17 @@ const App = () => {
       <Togglable buttonLabel="create new blog" ref={blogFormRef}>
         <BlogForm handleNewBlog={handleNewBlog} />
       </Togglable>
-      {blogs &&
-        blogs
-          .sort((a, b) => b.likes - a.likes)
-          .map((blog) => (
-            <Blog
-              user={user}
-              key={blog.id}
-              blog={blog}
-              handleUpdateBlog={handleUpdateBlog}
-              handleRemoveBlog={handleRemoveBlog}
-            />
-          ))}
+      {blogs
+        .sort((a, b) => b.likes - a.likes)
+        .map((blog) => (
+          <Blog
+            user={user}
+            key={blog.id}
+            blog={blog}
+            handleUpdateBlog={handleUpdateBlog}
+            handleRemoveBlog={handleRemoveBlog}
+          />
+        ))}
     </div>
   );
 };

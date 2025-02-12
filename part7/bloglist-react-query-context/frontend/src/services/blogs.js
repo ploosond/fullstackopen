@@ -28,13 +28,13 @@ export const update = async (newObject) => {
   return response.data;
 };
 
-export const remove = async (id) => {
+export const remove = async (newObject) => {
   const config = {
     headers: {
       Authorization: token,
     },
   };
-  const response = await axios.delete(`${baseUrl}/${id}`, config);
+  const response = await axios.delete(`${baseUrl}/${newObject.id}`, config);
   return response.data;
 };
 
