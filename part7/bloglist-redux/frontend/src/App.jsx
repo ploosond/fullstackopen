@@ -1,5 +1,12 @@
 import { useEffect, useRef } from 'react';
-import { Routes, Route, Link, useParams } from 'react-router';
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Link,
+  useParams,
+  useMatch,
+} from 'react-router';
 import Blog from './components/Blog';
 import blogService from './services/blogs';
 import loginService from './services/login';
@@ -12,6 +19,23 @@ import { username, password, reset } from './reducers/loginReducer';
 import { setUser, clearUser } from './reducers/userReducer';
 import './App.css';
 import { initializeUsers } from './reducers/usersReducer';
+
+const Header = () => {
+  const dispatch = useDispatch();
+  const user = useSelector((state) => state.user);
+
+  const handleLogout = () => {
+    window.localStorage.removeItem('loggedBlogappUser');
+    dispatch(clearUser());
+  };
+  return (
+    <div>
+      <h2>blogs</h2>
+      <p>{user.name} logged in</p>
+      <button onClick={handleLogout}>logout</button>
+    </div>
+  );
+};
 
 const LoginForm = () => {
   const dispatch = useDispatch();
@@ -74,14 +98,23 @@ const LoginForm = () => {
 
 const Blogs = () => {
   const blogs = useSelector((state) => state.blogs);
-  const user = useSelector((state) => state.user);
+
+  const blogStyle = {
+    paddingTop: 2,
+    paddingLeft: 2,
+    border: 'solid',
+    borderWidth: 1,
+    marginBottom: 5,
+  };
 
   return (
     <div>
       {[...blogs]
         .sort((a, b) => b.likes - a.likes)
         .map((blog) => (
-          <Blog user={user} key={blog.id} blog={blog} />
+          <Link key={blog.id} to={`/blogs/${blog.id}`}>
+            <div style={blogStyle}>{blog.title}</div>
+          </Link>
         ))}
     </div>
   );
@@ -102,20 +135,10 @@ const Notification = () => {
 };
 
 const Users = () => {
-  const dispatch = useDispatch();
   const users = useSelector((state) => state.users);
-  const user = useSelector((state) => state.user);
-
-  const handleLogout = () => {
-    window.localStorage.removeItem('loggedBlogappUser');
-    dispatch(clearUser());
-  };
 
   return (
     <div>
-      <h2>blogs</h2>
-      <p>{user.name} logged in</p>
-      <button onClick={handleLogout}>logout</button>
       <h2>Users</h2>
       <table>
         <thead>
@@ -140,16 +163,10 @@ const Users = () => {
 };
 
 const User = () => {
-  const dispatch = useDispatch();
   const id = useParams().id;
   const user = useSelector((state) =>
     state.users.find((user) => user.id === id)
   );
-
-  const handleLogout = () => {
-    window.localStorage.removeItem('loggedBlogappUser');
-    dispatch(clearUser());
-  };
 
   if (!user) {
     return null;
@@ -157,9 +174,6 @@ const User = () => {
 
   return (
     <div>
-      <h2>blogs</h2>
-      <p>{user.name} logged in</p>
-      <button onClick={handleLogout}>logout</button>
       <h2>{user.name}</h2>
       <h4>added blogs</h4>
       <ul>
@@ -235,11 +249,15 @@ const App = () => {
   }
 
   return (
-    <Routes>
-      <Route path="/" element={<Home />} />
-      <Route path="/users" element={<Users />} />
-      <Route path="/users/:id" element={<User />} />
-    </Routes>
+    <div>
+      <Header />
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/users" element={<Users />} />
+        <Route path="/users/:id" element={<User />} />
+        <Route path="/blogs/:id" element={<Blog />} />
+      </Routes>
+    </div>
   );
 };
 

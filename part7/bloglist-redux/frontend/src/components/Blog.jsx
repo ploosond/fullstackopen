@@ -1,26 +1,14 @@
-import { useState } from 'react';
-import PropTypes from 'prop-types';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { updateLikes, deleteBlog } from '../reducers/blogsReducer';
+import { useParams } from 'react-router';
 
-const Blog = ({ user, blog }) => {
+const Blog = () => {
   const dispatch = useDispatch();
-  const [blogView, setBlogView] = useState(false);
-
-  const showWhenVisible = { display: blogView ? 'none' : '' };
-  const hideWhenVisible = { display: blogView ? '' : 'none' };
-
-  const blogStyle = {
-    paddingTop: 10,
-    paddingLeft: 2,
-    border: 'solid',
-    borderWidth: 1,
-    marginBottom: 5,
-  };
-
-  const toggleView = () => {
-    setBlogView(!blogView);
-  };
+  const user = useSelector((state) => state.user);
+  const id = useParams().id;
+  const blog = useSelector((state) =>
+    state.blogs.find((blog) => blog.id === id)
+  );
 
   const handleLike = async () => {
     try {
@@ -42,28 +30,26 @@ const Blog = ({ user, blog }) => {
     }
   };
 
-  Blog.propTypes = {
-    blog: PropTypes.object.isRequired,
-  };
+  if (!blog) {
+    return null;
+  }
 
   return (
-    <div style={blogStyle}>
-      <div style={showWhenVisible} className="defaultDiv">
-        {blog.title} {blog.author} <button onClick={toggleView}>view</button>
+    <div>
+      <h2>
+        {blog.title} {blog.author}
+      </h2>
+      <div>{blog.url}</div>
+      <div>
+        {blog.likes}
+        <button onClick={handleLike}>likes</button>
       </div>
-      <div style={hideWhenVisible} className="toggledDiv">
-        {blog.title} {blog.author} <button onClick={toggleView}>hide</button>
-        <p>{blog.url}</p>
-        <p>
-          likes {blog.likes} <button onClick={handleLike}>like</button>
-        </p>
-        <p>{blog?.user?.name}</p>
-        {blog?.user?.name === user?.name && (
-          <button className="remove" onClick={handleRemove}>
-            remove
-          </button>
-        )}
-      </div>
+      <div>added by {blog.user !== null && blog.user.name}</div>
+      {blog.user.name === user.name && (
+        <button className="remove" onClick={handleRemove}>
+          remove
+        </button>
+      )}
     </div>
   );
 };
