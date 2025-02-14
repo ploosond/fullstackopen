@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { Routes, Route, Link } from 'react-router';
+import { Routes, Route, Link, useParams } from 'react-router';
 import Blog from './components/Blog';
 import blogService from './services/blogs';
 import loginService from './services/login';
@@ -127,12 +127,46 @@ const Users = () => {
         <tbody>
           {users.map((user) => (
             <tr key={user.id}>
-              <td>{user.name}</td>
+              <td>
+                <Link to={`/users/${user.id}`}>{user.name}</Link>
+              </td>
               <td>{user.blogs.length}</td>
             </tr>
           ))}
         </tbody>
       </table>
+    </div>
+  );
+};
+
+const User = () => {
+  const dispatch = useDispatch();
+  const id = useParams().id;
+  const user = useSelector((state) =>
+    state.users.find((user) => user.id === id)
+  );
+
+  const handleLogout = () => {
+    window.localStorage.removeItem('loggedBlogappUser');
+    dispatch(clearUser());
+  };
+
+  if (!user) {
+    return null;
+  }
+
+  return (
+    <div>
+      <h2>blogs</h2>
+      <p>{user.name} logged in</p>
+      <button onClick={handleLogout}>logout</button>
+      <h2>{user.name}</h2>
+      <h4>added blogs</h4>
+      <ul>
+        {user.blogs.map((blog) => (
+          <li key={blog.id}>{blog.title} </li>
+        ))}
+      </ul>
     </div>
   );
 };
@@ -183,6 +217,11 @@ const App = () => {
   const user = useSelector((state) => state.user);
 
   useEffect(() => {
+    dispatch(initializeBlogs());
+    dispatch(initializeUsers());
+  }, [dispatch]);
+
+  useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem('loggedBlogappUser');
     if (loggedUserJSON) {
       const user = JSON.parse(loggedUserJSON);
@@ -191,15 +230,6 @@ const App = () => {
     }
   }, [dispatch]);
 
-  useEffect(() => {
-    dispatch(initializeBlogs());
-  }, [dispatch]);
-
-  useEffect(() => {
-    dispatch(initializeUsers());
-  }, [dispatch]);
-
-  console.log(user);
   if (user === null) {
     return <LoginForm />;
   }
@@ -208,6 +238,7 @@ const App = () => {
     <Routes>
       <Route path="/" element={<Home />} />
       <Route path="/users" element={<Users />} />
+      <Route path="/users/:id" element={<User />} />
     </Routes>
   );
 };
