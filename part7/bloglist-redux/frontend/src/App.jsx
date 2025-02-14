@@ -24,15 +24,10 @@ const Header = () => {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.user);
 
-  const handleLogout = () => {
-    window.localStorage.removeItem('loggedBlogappUser');
-    dispatch(clearUser());
-  };
   return (
     <div>
-      <h2>blogs</h2>
+      <h2>blogs app</h2>
       <p>{user.name} logged in</p>
-      <button onClick={handleLogout}>logout</button>
     </div>
   );
 };
@@ -244,12 +239,37 @@ const App = () => {
     }
   }, [dispatch]);
 
+  const handleLogout = () => {
+    window.localStorage.removeItem('loggedBlogappUser');
+    dispatch(clearUser());
+  };
+
+  const padding = {
+    padding: 3,
+  };
+
   if (user === null) {
     return <LoginForm />;
   }
 
   return (
     <div>
+      <nav>
+        <Link style={padding} to="/">
+          blogs
+        </Link>
+        <Link style={padding} to="users">
+          users
+        </Link>
+        {user ? (
+          `${user.name} logged in `
+        ) : (
+          <Link style={padding} to="/login">
+            login
+          </Link>
+        )}
+        <button onClick={handleLogout}>logout</button>
+      </nav>
       <Header />
       <Routes>
         <Route path="/" element={<Home />} />

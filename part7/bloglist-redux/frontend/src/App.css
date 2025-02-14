@@ -21,3 +21,8 @@
 .remove {
   background: rgb(83, 114, 239);
 }
+
+nav {
+  background-color: #d3d3d3;
+  padding: 2px;
+}
