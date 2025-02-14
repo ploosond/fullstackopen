@@ -1,42 +1,22 @@
-import { useState, useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
+import { Routes, Route, Link } from 'react-router';
 import Blog from './components/Blog';
 import blogService from './services/blogs';
 import loginService from './services/login';
 import BlogForm from './components/BlogForm';
 import Togglable from './components/Togglable';
-import './App.css';
 import { useSelector, useDispatch } from 'react-redux';
 import { createNotification } from './reducers/notificationsReducer';
-import {
-  createBlog,
-  initializeBlogs,
-  updateLikes,
-  deleteBlog,
-} from './reducers/blogsReducer';
+import { createBlog, initializeBlogs } from './reducers/blogsReducer';
 import { username, password, reset } from './reducers/loginReducer';
 import { setUser, clearUser } from './reducers/userReducer';
+import './App.css';
+import { initializeUsers } from './reducers/usersReducer';
 
-const App = () => {
+const LoginForm = () => {
   const dispatch = useDispatch();
-  const blogs = useSelector((state) => state.blogs);
-  const login = useSelector((state) => state.login);
-  const user = useSelector((state) => state.user);
   const notification = useSelector((state) => state.notification);
-
-  const blogFormRef = useRef();
-
-  useEffect(() => {
-    dispatch(initializeBlogs());
-  }, [dispatch]);
-
-  useEffect(() => {
-    const loggedUserJSON = window.localStorage.getItem('loggedBlogappUser');
-    if (loggedUserJSON) {
-      const user = JSON.parse(loggedUserJSON);
-      dispatch(setUser(user));
-      blogService.setToken(user.token);
-    }
-  }, []);
+  const login = useSelector((state) => state.login);
 
   const handleLogin = async (event) => {
     event.preventDefault();
@@ -59,11 +39,108 @@ const App = () => {
       );
     }
   };
+  return (
+    <div>
+      <h2>Log in to application</h2>
+      {notification.type === 'error' && (
+        <p className="error">{notification.message}</p>
+      )}
+      <form onSubmit={handleLogin}>
+        <div>
+          username
+          <input
+            data-testid="username"
+            type="text"
+            name="Username"
+            value={login.username}
+            onChange={(e) => dispatch(username(e.target.value))}
+          />
+        </div>
+        <div>
+          password
+          <input
+            data-testid="password"
+            type="text"
+            name="Password"
+            value={login.password}
+            onChange={(e) => dispatch(password(e.target.value))}
+          />
+        </div>
+        <button type="submit">login</button>
+      </form>
+    </div>
+  );
+};
+
+const Blogs = () => {
+  const blogs = useSelector((state) => state.blogs);
+  const user = useSelector((state) => state.user);
+
+  return (
+    <div>
+      {[...blogs]
+        .sort((a, b) => b.likes - a.likes)
+        .map((blog) => (
+          <Blog user={user} key={blog.id} blog={blog} />
+        ))}
+    </div>
+  );
+};
+
+const Notification = () => {
+  const notification = useSelector((state) => state.notification);
+  return (
+    <div>
+      {notification.type === 'success' && (
+        <p className="success">{notification.message}</p>
+      )}
+      {notification.type === 'error' && (
+        <p className="error">{notification.message}</p>
+      )}
+    </div>
+  );
+};
+
+const Users = () => {
+  const dispatch = useDispatch();
+  const users = useSelector((state) => state.users);
+  const user = useSelector((state) => state.user);
 
   const handleLogout = () => {
     window.localStorage.removeItem('loggedBlogappUser');
     dispatch(clearUser());
   };
+
+  return (
+    <div>
+      <h2>blogs</h2>
+      <p>{user.name} logged in</p>
+      <button onClick={handleLogout}>logout</button>
+      <h2>Users</h2>
+      <table>
+        <thead>
+          <tr>
+            <th></th>
+            <th>blogs created</th>
+          </tr>
+        </thead>
+        <tbody>
+          {users.map((user) => (
+            <tr key={user.id}>
+              <td>{user.name}</td>
+              <td>{user.blogs.length}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+};
+
+const Home = () => {
+  const dispatch = useDispatch();
+
+  const blogFormRef = useRef();
 
   const handleNewBlog = async (blogObject) => {
     try {
@@ -90,88 +167,48 @@ const App = () => {
     }
   };
 
-  const handleUpdateBlog = async (newObject) => {
-    try {
-      await dispatch(updateLikes(newObject));
-    } catch (exception) {
-      console.log(exception);
-    }
-  };
-
-  const handleRemoveBlog = async (newObject) => {
-    if (
-      window.confirm(`Remove blog ${newObject.title} by ${newObject.author}`)
-    ) {
-      try {
-        dispatch(deleteBlog(newObject));
-      } catch (exception) {
-        console.log(exception);
-      }
-    }
-  };
-
-  if (user === null) {
-    return (
-      <div>
-        <h2>Log in to application</h2>
-        {notification.type === 'error' && (
-          <p className="error">{notification.message}</p>
-        )}
-        <form onSubmit={handleLogin}>
-          <div>
-            username
-            <input
-              data-testid="username"
-              type="text"
-              name="Username"
-              value={login.username}
-              onChange={(e) => dispatch(username(e.target.value))}
-            />
-          </div>
-          <div>
-            password
-            <input
-              data-testid="password"
-              type="text"
-              name="Password"
-              value={login.password}
-              onChange={(e) => dispatch(password(e.target.value))}
-            />
-          </div>
-          <button type="submit">login</button>
-        </form>
-      </div>
-    );
-  }
-
   return (
     <div>
-      <h2>blogs</h2>
-      {notification.type === 'success' && (
-        <p className="success">{notification.message}</p>
-      )}
-      {notification.type === 'error' && (
-        <p className="error">{notification.message}</p>
-      )}
-      <p>
-        {user.name} logged in
-        <button onClick={handleLogout}>logout</button>
-      </p>
+      <Notification />
       <Togglable buttonLabel="create new blog" ref={blogFormRef}>
         <BlogForm handleNewBlog={handleNewBlog} />
       </Togglable>
-      {[...blogs]
-        .sort((a, b) => b.likes - a.likes)
-        .map((blog) => (
-          <Blog
-            user={user}
-            key={blog.id}
-            blog={blog}
-            handleUpdateBlog={handleUpdateBlog}
-            handleRemoveBlog={handleRemoveBlog}
-          />
-        ))}
+      <Blogs />
     </div>
+  );
+};
+
+const App = () => {
+  const dispatch = useDispatch();
+  const user = useSelector((state) => state.user);
+
+  useEffect(() => {
+    const loggedUserJSON = window.localStorage.getItem('loggedBlogappUser');
+    if (loggedUserJSON) {
+      const user = JSON.parse(loggedUserJSON);
+      dispatch(setUser(user));
+      blogService.setToken(user.token);
+    }
+  }, [dispatch]);
+
+  useEffect(() => {
+    dispatch(initializeBlogs());
+  }, [dispatch]);
+
+  useEffect(() => {
+    dispatch(initializeUsers());
+  }, [dispatch]);
+
+  console.log(user);
+  if (user === null) {
+    return <LoginForm />;
+  }
+
+  return (
+    <Routes>
+      <Route path="/" element={<Home />} />
+      <Route path="/users" element={<Users />} />
+    </Routes>
   );
 };
 
