@@ -1,8 +1,15 @@
 import { useDispatch, useSelector } from 'react-redux';
-import { updateLikes, deleteBlog } from '../reducers/blogsReducer';
+import {
+  updateLikes,
+  deleteBlog,
+  addNewComment,
+} from '../reducers/blogsReducer';
 import { useParams } from 'react-router';
+import { useState } from 'react';
+import blogService from '../services/blogs';
 
 const Blog = () => {
+  const [comment, setComment] = useState('');
   const dispatch = useDispatch();
   const user = useSelector((state) => state.user);
   const id = useParams().id;
@@ -18,6 +25,12 @@ const Blog = () => {
     } catch (exception) {
       console.log(exception);
     }
+  };
+
+  const handleComment = async (event) => {
+    event.preventDefault();
+    dispatch(addNewComment(blog.id, { comment }));
+    setComment('');
   };
 
   const handleRemove = () => {
@@ -50,6 +63,22 @@ const Blog = () => {
           remove
         </button>
       )}
+      <h4>comments</h4>
+      <form onSubmit={handleComment}>
+        <input
+          type="text"
+          name="comment"
+          value={comment}
+          onChange={(e) => setComment(e.target.value)}
+        />
+        <button>add comment</button>
+      </form>
+
+      <ul>
+        {blog.comments.map((comment, i) => (
+          <li key={i}>{comment}</li>
+        ))}
+      </ul>
     </div>
   );
 };

@@ -43,6 +43,13 @@ export const updateLikes = (object) => {
   };
 };
 
+export const addNewComment = (id, comment) => {
+  return async (dispatch) => {
+    const updatedBlog = await blogService.appendComment(id, comment);
+    dispatch(updateBlog(updatedBlog));
+  };
+};
+
 export const deleteBlog = (object) => {
   return async (dispatch) => {
     const deletedBlog = await blogService.remove(object);

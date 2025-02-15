@@ -26,6 +26,7 @@ blogsRouter.post('/', middleware.userExtractor, async (req, res) => {
     author: body.author,
     url: body.url,
     likes: body.likes || 0,
+    comments: [],
     user: user,
   });
 
@@ -36,6 +37,23 @@ blogsRouter.post('/', middleware.userExtractor, async (req, res) => {
   res.status(201).json(savedBlog);
 });
 
+blogsRouter.post('/:id/comments', async (req, res) => {
+  const { comment } = req.body;
+  console.log(comment);
+
+  if (!comment) {
+    return res.status(400).json({ error: 'comment is missing' });
+  }
+
+  const blog = await Blog.findById(req.params.id).populate('user', {
+    username: 1,
+    name: 1,
+  });
+  blog.comments = blog.comments.concat(comment);
+  const updatedBlog = await blog.save();
+  res.status(201).json(updatedBlog);
+});
+
 blogsRouter.put('/:id', async (req, res) => {
   const body = req.body;
   const blog = {
@@ -43,6 +61,7 @@ blogsRouter.put('/:id', async (req, res) => {
     author: body.author,
     url: body.url,
     likes: body.likes,
+    comments: body.comments,
   };
   const updatedBlog = await Blog.findByIdAndUpdate(req.params.id, blog, {
     new: true,
