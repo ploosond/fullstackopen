@@ -4,11 +4,11 @@ import {
   deleteBlog,
   addNewComment,
 } from '../reducers/blogsReducer';
-import { useParams } from 'react-router';
+import { useNavigate, useParams } from 'react-router';
 import { useState } from 'react';
-import blogService from '../services/blogs';
 
 const Blog = () => {
+  const naviagte = useNavigate();
   const [comment, setComment] = useState('');
   const dispatch = useDispatch();
   const user = useSelector((state) => state.user);
@@ -37,6 +37,7 @@ const Blog = () => {
     if (window.confirm(`Remove blog ${blog.title} by ${blog.author}`)) {
       try {
         dispatch(deleteBlog(blog));
+        naviagte('/');
       } catch (exception) {
         console.log(exception);
       }
@@ -49,6 +50,7 @@ const Blog = () => {
 
   return (
     <div>
+      <h2>blog app</h2>
       <h2>
         {blog.title} {blog.author}
       </h2>

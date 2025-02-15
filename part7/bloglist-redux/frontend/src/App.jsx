@@ -6,6 +6,7 @@ import {
   Link,
   useParams,
   useMatch,
+  useNavigate,
 } from 'react-router';
 import Blog from './components/Blog';
 import blogService from './services/blogs';
@@ -20,22 +21,11 @@ import { setUser, clearUser } from './reducers/userReducer';
 import './App.css';
 import { initializeUsers } from './reducers/usersReducer';
 
-const Header = () => {
-  const dispatch = useDispatch();
-  const user = useSelector((state) => state.user);
-
-  return (
-    <div>
-      <h2>blogs app</h2>
-      <p>{user.name} logged in</p>
-    </div>
-  );
-};
-
 const LoginForm = () => {
   const dispatch = useDispatch();
   const notification = useSelector((state) => state.notification);
   const login = useSelector((state) => state.login);
+  const naviagte = useNavigate();
 
   const handleLogin = async (event) => {
     event.preventDefault();
@@ -46,6 +36,7 @@ const LoginForm = () => {
       blogService.setToken(user.token);
       dispatch(setUser(user));
       dispatch(reset());
+      naviagte('/');
     } catch (exception) {
       dispatch(
         createNotification(
@@ -134,6 +125,7 @@ const Users = () => {
 
   return (
     <div>
+      <h2>blog app</h2>
       <h2>Users</h2>
       <table>
         <thead>
@@ -169,6 +161,7 @@ const User = () => {
 
   return (
     <div>
+      <h2>blog app</h2>
       <h2>{user.name}</h2>
       <h4>added blogs</h4>
       <ul>
@@ -212,6 +205,7 @@ const Home = () => {
 
   return (
     <div>
+      <h2>blog app</h2>
       <Notification />
       <Togglable buttonLabel="create new blog" ref={blogFormRef}>
         <BlogForm handleNewBlog={handleNewBlog} />
@@ -224,6 +218,7 @@ const Home = () => {
 const App = () => {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.user);
+  const naviagte = useNavigate();
 
   useEffect(() => {
     dispatch(initializeBlogs());
@@ -242,6 +237,7 @@ const App = () => {
   const handleLogout = () => {
     window.localStorage.removeItem('loggedBlogappUser');
     dispatch(clearUser());
+    naviagte('/login');
   };
 
   const padding = {
@@ -270,12 +266,13 @@ const App = () => {
         )}
         <button onClick={handleLogout}>logout</button>
       </nav>
-      <Header />
+
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/users" element={<Users />} />
         <Route path="/users/:id" element={<User />} />
         <Route path="/blogs/:id" element={<Blog />} />
+        <Route path="/login" element={<LoginForm />} />
       </Routes>
     </div>
   );
