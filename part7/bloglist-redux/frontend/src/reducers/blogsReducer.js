@@ -43,9 +43,9 @@ export const updateLikes = (object) => {
   };
 };
 
-export const addNewComment = (id, comment) => {
+export const addNewComment = (object, comment) => {
   return async (dispatch) => {
-    const updatedBlog = await blogService.appendComment(id, comment);
+    const updatedBlog = await blogService.createComment(object.id, comment);
     dispatch(updateBlog(updatedBlog));
   };
 };

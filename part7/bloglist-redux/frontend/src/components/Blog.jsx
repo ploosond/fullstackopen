@@ -29,7 +29,7 @@ const Blog = () => {
 
   const handleComment = async (event) => {
     event.preventDefault();
-    dispatch(addNewComment(blog.id, { comment }));
+    dispatch(addNewComment(blog, { comment }));
     setComment('');
   };
 
