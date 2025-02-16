@@ -1,11 +1,21 @@
+import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate, useParams } from 'react-router';
 import {
   updateLikes,
   deleteBlog,
   addNewComment,
 } from '../reducers/blogsReducer';
-import { useNavigate, useParams } from 'react-router';
-import { useState } from 'react';
+import {
+  Typography,
+  Button,
+  Paper,
+  Box,
+  TextField,
+  List,
+  ListItem,
+  ListItemText,
+} from '@mui/material';
 
 const Blog = () => {
   const naviagte = useNavigate();
@@ -49,39 +59,61 @@ const Blog = () => {
   }
 
   return (
-    <div>
-      <h2>blog app</h2>
-      <h2>
+    <Paper elevation={2} sx={{ padding: '1em' }}>
+      <Typography variant="h4">
         {blog.title} {blog.author}
-      </h2>
-      <div>{blog.url}</div>
-      <div>
-        {blog.likes}
-        <button onClick={handleLike}>likes</button>
-      </div>
-      <div>added by {blog.user !== null && blog.user.name}</div>
+      </Typography>
+      <Typography variant="h6">{blog.url}</Typography>
+      <Typography variant="h6">
+        {`${blog.likes} `}
+        <Button size="small" variant="contained" onClick={handleLike}>
+          likes
+        </Button>
+      </Typography>
+      <Typography variant="h5">
+        added by {blog.user !== null && blog.user.name}
+      </Typography>
       {blog.user.name === user.name && (
-        <button className="remove" onClick={handleRemove}>
+        <Button
+          size="small"
+          variant="contained"
+          color="warning"
+          className="remove"
+          onClick={handleRemove}
+        >
           remove
-        </button>
+        </Button>
       )}
-      <h4>comments</h4>
-      <form onSubmit={handleComment}>
-        <input
+      <Typography sx={{ marginTop: '0.5em' }} variant="h4">
+        comments
+      </Typography>
+      <Box
+        component="form"
+        sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
+        onSubmit={handleComment}
+      >
+        <TextField
+          size="small"
+          variant="outlined"
+          label="Add comment here..."
           type="text"
           name="comment"
           value={comment}
           onChange={(e) => setComment(e.target.value)}
         />
-        <button>add comment</button>
-      </form>
+        <Button size="small" variant="contained">
+          add comment
+        </Button>
+      </Box>
 
-      <ul>
+      <List>
         {blog.comments.map((comment, i) => (
-          <li key={i}>{comment}</li>
+          <ListItem key={i}>
+            <ListItemText>{comment}</ListItemText>
+          </ListItem>
         ))}
-      </ul>
-    </div>
+      </List>
+    </Paper>
   );
 };
 
