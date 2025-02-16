@@ -14,6 +14,10 @@ import {
 const Users = () => {
   const users = useSelector((state) => state.users);
 
+  if (!users) {
+    return null;
+  }
+
   return (
     <TableContainer component={Paper} style={{ margin: '1em' }}>
       <Typography variant="h4" component="h2" style={{ padding: '1em' }}>

@@ -101,7 +101,7 @@ const Blog = () => {
           value={comment}
           onChange={(e) => setComment(e.target.value)}
         />
-        <Button size="small" variant="contained">
+        <Button size="small" variant="contained" onClick={handleComment}>
           add comment
         </Button>
       </Box>

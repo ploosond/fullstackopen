@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Routes, Route, Navigate, useNavigate } from 'react-router';
 import { useSelector, useDispatch } from 'react-redux';
 import Home from './components/Home';
@@ -85,6 +85,7 @@ const Login = () => {
 const App = () => {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.user);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     dispatch(initializeBlogs());
@@ -98,7 +99,12 @@ const App = () => {
       dispatch(setUser(user));
       blogService.setToken(user.token);
     }
+    setLoading(false);
   }, [dispatch]);
+
+  if (loading) {
+    return null;
+  }
 
   return (
     <Container>
