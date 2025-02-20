@@ -30,7 +30,7 @@ const Authors = () => {
           ))}
         </tbody>
       </table>
-      <EditAuthor />
+      <EditAuthor authors={data.allAuthors} />
     </div>
   );
 };
