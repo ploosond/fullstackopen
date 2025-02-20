@@ -159,6 +159,7 @@ const resolvers = {
     },
     allAuthors: () => {
       return authors.map((author) => ({
+        ...author,
         born: author.born,
         name: author.name,
         bookCount: books.filter((book) => book.author === author.name).length,
