@@ -104,7 +104,7 @@ const typeDefs = `
   type Author {
   name: String!
   born: Int
-  bookCount: Int!
+  bookCount: Int
   id: ID!
   }
 
@@ -143,10 +143,37 @@ const resolvers = {
     bookCount: async () => Book.collection.countDocuments(),
     authorCount: async () => Author.collection.countDocuments(),
     allBooks: async (root, args) => {
+      if (args.author && args.genre) {
+        const author = await Author.findOne({ name: args.author });
+        return Book.find({
+          author: author._id,
+          genres: { $in: [args.genre] },
+        }).populate("author");
+      }
+
+      if (args.author) {
+        const author = await Author.findOne({ name: args.author });
+        return Book.find({ author: author._id }).populate("author");
+      }
+
+      if (args.genre) {
+        return Book.find({ genres: { $in: [args.genre] } }).populate("author");
+      }
+
       return Book.find({}).populate("author");
     },
     allAuthors: async () => {
-      return Author.find({});
+      const authors = await Author.find({});
+      const books = await Book.find({}).populate("author");
+      return authors.map((author) => {
+        return {
+          ...author.toObject(),
+          id: author._id,
+          bookCount: books.filter(
+            (book) => book.author._id.toString() === author._id.toString()
+          ).length,
+        };
+      });
     },
   },
   Mutation: {
