@@ -3,7 +3,6 @@ import { ALL_BOOKS } from "../queries";
 
 const Books = () => {
   const { loading, error, data } = useQuery(ALL_BOOKS);
-  console.log(data);
 
   if (loading) {
     return <div>loading...</div>;
