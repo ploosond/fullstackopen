@@ -1,17 +1,18 @@
-import { useQuery } from "@apollo/client";
-import { ALL_BOOKS } from "../queries";
 import { useState } from "react";
 
-const Books = () => {
+const Books = ({ books }) => {
   const [show, setShow] = useState(true);
   const [genre, setGenre] = useState(null);
-  const { loading, error, data } = useQuery(ALL_BOOKS);
 
-  if (loading) {
+  if (books.loading) {
     return <div>loading...</div>;
   }
 
-  const genres = data.allBooks
+  if (books.error) {
+    return null;
+  }
+
+  const genres = books.data.allBooks
     .map((b) => b.genres)
     .flat()
     .reduce(
@@ -27,9 +28,9 @@ const Books = () => {
     setShow(false);
   };
 
-  const books = show
-    ? data.allBooks
-    : data.allBooks.filter((b) => b.genres.includes(genre));
+  const showBooks = show
+    ? books.data.allBooks
+    : books.data.allBooks.filter((b) => b.genres.includes(genre));
 
   return (
     <div>
@@ -47,7 +48,7 @@ const Books = () => {
             <th>author</th>
             <th>published</th>
           </tr>
-          {books.map((a) => (
+          {showBooks.map((a) => (
             <tr key={a.id}>
               <td>{a.title}</td>
               <td>{a.author.name}</td>

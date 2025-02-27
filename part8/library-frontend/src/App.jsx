@@ -4,11 +4,19 @@ import Authors from "./components/Authors";
 import Books from "./components/Books";
 import NewBook from "./components/NewBook";
 import LoginForm from "./components/LoginForm";
-import { useApolloClient } from "@apollo/client";
+import { useApolloClient, useQuery } from "@apollo/client";
+import Favorite from "./components/Favorite";
+import { ALL_AUTHORS, ALL_BOOKS, ME } from "./queries";
 
 const App = () => {
-  const [token, setToken] = useState(localStorage.getItem("user-token"));
   const client = useApolloClient();
+  const [token, setToken] = useState(localStorage.getItem("user-token"));
+  const user = useQuery(ME, {
+    skip: !token,
+  });
+  const books = useQuery(ALL_BOOKS);
+  const authors = useQuery(ALL_AUTHORS);
+
   const navigate = useNavigate();
   const padding = {
     padding: "3px",
@@ -37,6 +45,9 @@ const App = () => {
             <Link style={padding} to="/add">
               add book
             </Link>
+            <Link style={padding} to="/favorite">
+              recommend
+            </Link>
 
             <button style={padding} onClick={logout}>
               logout
@@ -51,11 +62,21 @@ const App = () => {
       <Routes>
         <Route
           path="/"
-          element={token ? <Authors /> : <Navigate replace to="/login" />}
+          element={
+            token ? (
+              <Authors authors={authors} />
+            ) : (
+              <Navigate replace to="/login" />
+            )
+          }
         />
         <Route path="/login" element={<LoginForm setToken={setToken} />} />
-        <Route path="/books" element={<Books />} />
+        <Route path="/books" element={<Books books={books} />} />
         <Route path="/add" element={<NewBook />} />
+        <Route
+          path="/favorite"
+          element={<Favorite user={user} books={books} />}
+        />
       </Routes>
     </div>
   );

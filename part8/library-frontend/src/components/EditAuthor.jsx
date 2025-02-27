@@ -13,6 +13,7 @@ const EditAuthor = ({ authors }) => {
   const submit = (event) => {
     event.preventDefault();
     changeAuthor({ variables: { name, setBornTo: parseInt(setBornTo) } });
+    setSetBornTo("");
   };
 
   return (
