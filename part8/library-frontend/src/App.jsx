@@ -7,7 +7,7 @@ import LoginForm from "./components/LoginForm";
 import { useApolloClient } from "@apollo/client";
 
 const App = () => {
-  const [token, setToken] = useState(null);
+  const [token, setToken] = useState(localStorage.getItem("user-token"));
   const client = useApolloClient();
   const navigate = useNavigate();
   const padding = {
