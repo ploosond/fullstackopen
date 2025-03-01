@@ -1,4 +1,3 @@
-import { useQuery } from "@apollo/client";
 import EditAuthor from "./EditAuthor";
 
 const Authors = ({ authors }) => {

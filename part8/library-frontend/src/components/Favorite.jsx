@@ -13,9 +13,9 @@ const Favorite = ({ user, books }) => {
     return <p>Error {books.error.message}</p>;
   }
 
-  const favoriteGenre = user ? user.data.me.favoriteGenre : null;
+  const favoriteGenre = user ? user.data?.me.favoriteGenre : null;
 
-  const favoriteBooks = books.data.allBooks?.filter((b) =>
+  const favoriteBooks = books.data?.allBooks.filter((b) =>
     b.genres.includes(favoriteGenre)
   );
 

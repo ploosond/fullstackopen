@@ -16,7 +16,14 @@ const NewBook = () => {
       const messages = error.graphQLErrors.map((e) => e.message).join("\n");
       console.log(messages);
     },
-    refetchQueries: [{ query: ALL_BOOKS }, { query: ALL_AUTHORS }],
+    refetchQueries: [{ query: ALL_AUTHORS }],
+    update: (caches, response) => {
+      caches.updateQuery({ query: ALL_BOOKS }, ({ allBooks }) => {
+        return {
+          allBooks: allBooks.concat(response.data.addBook),
+        };
+      });
+    },
   });
 
   const submit = async (event) => {
