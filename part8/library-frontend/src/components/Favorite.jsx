@@ -1,16 +1,16 @@
 const Favorite = ({ user, books }) => {
   if (user.loading) {
-    return <div>loading</div>;
+    return <p>Loading...</p>;
   }
   if (books.loading) {
-    return <div>loading</div>;
+    return <p>Loading...</p>;
   }
 
-  if (!user) {
-    return null;
+  if (user.error) {
+    return <p>Error {user.error.message}</p>;
   }
-  if (!books) {
-    return null;
+  if (books.error) {
+    return <p>Error {books.error.message}</p>;
   }
 
   const favoriteGenre = user ? user.data.me.favoriteGenre : null;

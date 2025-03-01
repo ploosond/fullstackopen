@@ -3,11 +3,11 @@ import EditAuthor from "./EditAuthor";
 
 const Authors = ({ authors }) => {
   if (authors.loading) {
-    return <div>loading...</div>;
+    return <p>Loading...</p>;
   }
 
   if (authors.error) {
-    return null;
+    return <p>Error {authors.error.message}</p>;
   }
 
   const showAuthors = authors.data.allAuthors;

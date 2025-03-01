@@ -9,13 +9,13 @@ import Favorite from "./components/Favorite";
 import { ALL_AUTHORS, ALL_BOOKS, ME } from "./queries";
 
 const App = () => {
-  const client = useApolloClient();
   const [token, setToken] = useState(localStorage.getItem("user-token"));
   const user = useQuery(ME, {
     skip: !token,
   });
   const books = useQuery(ALL_BOOKS);
   const authors = useQuery(ALL_AUTHORS);
+  const client = useApolloClient();
 
   const navigate = useNavigate();
   const padding = {
