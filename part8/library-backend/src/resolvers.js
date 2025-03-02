@@ -51,21 +51,14 @@ const resolvers = {
       return Book.find({}).populate("author");
     },
     allAuthors: async () => {
-      const authors = await Author.find({});
-      const books = await Book.find({}).populate("author");
-      return authors.map((author) => {
-        return {
-          ...author.toObject(),
-          id: author._id,
-          bookCount: books.filter(
-            (book) => book.author._id.toString() === author._id.toString()
-          ).length,
-        };
-      });
+      return Author.find({});
     },
     me: async (root, args, context) => {
       return context.currentUser;
     },
+  },
+  Author: {
+    bookCount: async (root) => Book.find({ author: root.id }).countDocuments(),
   },
   Mutation: {
     addBook: async (root, args, context) => {

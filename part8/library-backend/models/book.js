@@ -1,7 +1,5 @@
 const mongoose = require("mongoose");
 
-// you must install this library
-
 const schema = new mongoose.Schema({
   title: {
     type: String,
