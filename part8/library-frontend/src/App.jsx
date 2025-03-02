@@ -1,12 +1,12 @@
-import { useEffect, useState } from "react";
-import { Routes, Route, Link, Navigate, useNavigate } from "react-router";
+import { useState } from "react";
+import { Routes, Route, Link, Navigate, useNavigate, data } from "react-router";
 import Authors from "./components/Authors";
 import Books from "./components/Books";
 import NewBook from "./components/NewBook";
 import LoginForm from "./components/LoginForm";
-import { useApolloClient, useQuery } from "@apollo/client";
+import { useApolloClient, useQuery, useSubscription } from "@apollo/client";
 import Favorite from "./components/Favorite";
-import { ALL_AUTHORS, ALL_BOOKS, ME } from "./queries";
+import { ALL_AUTHORS, ALL_BOOKS, BOOK_ADDED, ME } from "./queries";
 
 const App = () => {
   const [token, setToken] = useState(localStorage.getItem("user-token"));
@@ -16,6 +16,13 @@ const App = () => {
   const books = useQuery(ALL_BOOKS);
   const authors = useQuery(ALL_AUTHORS);
   const client = useApolloClient();
+
+  useSubscription(BOOK_ADDED, {
+    onData: ({ data, client }) => {
+      const addedBook = data.data.bookAdded;
+      window.alert(`${addedBook.title} added`);
+    },
+  });
 
   const navigate = useNavigate();
   const padding = {
