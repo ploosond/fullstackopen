@@ -17,13 +17,6 @@ const NewBook = () => {
       console.log(messages);
     },
     refetchQueries: [{ query: ALL_AUTHORS }],
-    update: (caches, response) => {
-      caches.updateQuery({ query: ALL_BOOKS }, ({ allBooks }) => {
-        return {
-          allBooks: allBooks.concat(response.data.addBook),
-        };
-      });
-    },
   });
 
   const submit = async (event) => {
