@@ -82,8 +82,12 @@ Learn **React**, **Redux**, **Node.js**, **MongoDB**, **GraphQL** and **TypeScri
 
 ## Course Certificates
 
-### Full Stack Open: Core Course
+### Full Stack Certificate - Parts 0-7
 
-![Full Stack Open Core Course Certificate](./.img/certificate-fullstack.png)
+![Full Stack Certificate](./.img/certificate-fullstack.png)
+
+### GraphQL Certificate - Part 8
+
+![GraphQL Certificate](./.img/certificate-graphql.png)
 
 ---
