@@ -1,3 +1,24 @@
+interface Arguments {
+  input1: number[];
+  input2: number;
+}
+
+const parseInputs = (args: string[]): Arguments => {
+  if (args.length < 4) throw new Error("Not enough arguments");
+  if (
+    !isNaN(Number(args[2])) &&
+    args
+      .slice(3)
+      .map((n) => Number(n))
+      .every((n) => !isNaN(n))
+  ) {
+    return {
+      input1: args.slice(3).map((n) => Number(n)),
+      input2: Number(args[2]),
+    };
+  }
+};
+
 interface Result {
   periodLength: number;
   trainingDays: number;
@@ -42,4 +63,13 @@ const calculateExercises = (exercises: number[], target: number): Result => {
   };
 };
 
-console.log(calculateExercises([3, 0, 2, 4.5, 0, 3, 1], 2));
+try {
+  const { input1, input2 } = parseInputs(process.argv);
+  console.log(calculateExercises(input1, input2));
+} catch (error: unknown) {
+  let errorMessage = "Something bad happened.";
+  if (error instanceof Error) {
+    errorMessage += "Error: " + error.message;
+  }
+  console.log(errorMessage);
+}
