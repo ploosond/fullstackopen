@@ -74,8 +74,8 @@ Learn **React**, **Redux**, **Node.js**, **MongoDB**, **GraphQL** and **TypeScri
 - [x] **part4**: Testing Express Servers, User Administration
 - [x] **part5**: Testing React Apps
 - [x] **part6**: Advanced State Management
-- [ ] **part7**: React Router, Custom Hooks, Styling App with CSS and Webpack
-- [ ] **part8**: GraphQL
+- [x] **part7**: React Router, Custom Hooks, Styling App with CSS and Webpack
+- [x] **part8**: GraphQL
 - [ ] **part9**: TypeScript
 
 ---
