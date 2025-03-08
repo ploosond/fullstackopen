@@ -16,6 +16,8 @@ const parseInputs = (args: string[]): Arguments => {
       input1: args.slice(3).map((n) => Number(n)),
       input2: Number(args[2]),
     };
+  } else {
+    throw new Error("Provided values were not numbers!");
   }
 };
 

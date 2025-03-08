@@ -17,10 +17,7 @@ export const parseArguments = (args: string[]): Inputs => {
   }
 };
 
-export const calculateBmi = (
-  height: number,
-  weight: number
-): string | undefined => {
+export const calculateBmi = (height: number, weight: number): string => {
   height /= 100;
 
   const result = weight / (height * height);
@@ -41,9 +38,9 @@ export const calculateBmi = (
     return "Obese (Class II)";
   } else if (result >= 40.0) {
     return "Obese (Class III) ";
+  } else {
+    throw new Error("Provided values were not numbers");
   }
-
-  return undefined;
 };
 
 if (require.main === module) {
