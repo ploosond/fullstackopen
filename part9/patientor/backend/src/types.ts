@@ -16,3 +16,5 @@ export interface Diagnosis {
 }
 
 export type PatientEntriesWithoutSSN = Omit<Patient, "ssn">[];
+
+export type NewPatientEntry = Omit<Patient, "id">;
