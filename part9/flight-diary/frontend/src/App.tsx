@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { Diary } from "./types";
-import { getAllDiaries } from "./serviceDiary";
+import { Diary, NewDiary, Visibility, Weather } from "./types";
+import { createDiary, getAllDiaries } from "./serviceDiary";
 
 const App = () => {
   const [diaries, setDiaries] = useState<Diary[]>([]);
-  const [newDiary, setNewDiar] = useState({
+  const [newDiary, setNewDiar] = useState<NewDiary>({
     date: "",
-    visibility: "",
-    weather: "",
+    visibility: "" as Visibility,
+    weather: "" as Weather,
     comment: "",
   });
 
@@ -18,12 +18,24 @@ const App = () => {
   }, []);
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setNewDiar({ ...newDiary, [event.target.name]: event.target.value });
+    setNewDiar((prev) => ({
+      ...prev,
+      [event.target.name]: event.target.value,
+    }));
   };
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     console.log(newDiary);
+    createDiary(newDiary).then((data) => {
+      setDiaries(diaries.concat(data));
+    });
+    setNewDiar({
+      date: "",
+      visibility: "" as Visibility,
+      weather: "" as Weather,
+      comment: "",
+    });
   };
 
   return (
@@ -33,19 +45,39 @@ const App = () => {
         <form onSubmit={handleSubmit}>
           <div>
             date
-            <input type="date" name="date" onChange={handleChange} />
+            <input
+              type="date"
+              name="date"
+              value={newDiary.date}
+              onChange={handleChange}
+            />
           </div>
           <div>
             visibility
-            <input type="text" name="visibility" onChange={handleChange} />
+            <input
+              type="text"
+              name="visibility"
+              value={newDiary.visibility}
+              onChange={handleChange}
+            />
           </div>
           <div>
             weather
-            <input type="text" name="weather" onChange={handleChange} />
+            <input
+              type="text"
+              name="weather"
+              value={newDiary.weather}
+              onChange={handleChange}
+            />
           </div>
           <div>
             comment
-            <input type="text" name="comment" onChange={handleChange} />
+            <input
+              type="text"
+              name="comment"
+              value={newDiary.comment}
+              onChange={handleChange}
+            />
           </div>
           <button type="submit">add</button>
         </form>
