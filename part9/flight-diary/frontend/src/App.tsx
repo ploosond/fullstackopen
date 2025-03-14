@@ -1,6 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { Diary, NewDiary, Visibility, Weather } from "./types";
 import { createDiary, getAllDiaries } from "./serviceDiary";
+import axios from "axios";
+
+const Notify = ({ message }: { message: string }) => {
+  return <p style={{ color: "red" }}>{message}</p>;
+};
 
 const App = () => {
   const [diaries, setDiaries] = useState<Diary[]>([]);
@@ -10,6 +15,11 @@ const App = () => {
     weather: "" as Weather,
     comment: "",
   });
+  const [errorMessage, setErrorMessage] = useState("");
+
+  const notify = (message: string) => {
+    setErrorMessage(message);
+  };
 
   useEffect(() => {
     getAllDiaries().then((data) => {
@@ -26,10 +36,18 @@ const App = () => {
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    console.log(newDiary);
-    createDiary(newDiary).then((data) => {
-      setDiaries(diaries.concat(data));
-    });
+    createDiary(newDiary)
+      .then((data) => {
+        setDiaries(diaries.concat(data));
+      })
+      .catch((error) => {
+        if (axios.isAxiosError(error)) {
+          notify(error.response?.data);
+          setTimeout(() => {
+            notify("");
+          }, 5000);
+        }
+      });
     setNewDiar({
       date: "",
       visibility: "" as Visibility,
@@ -42,11 +60,12 @@ const App = () => {
     <div>
       <div>
         <h3>Add new entry</h3>
+        <Notify message={errorMessage} />
         <form onSubmit={handleSubmit}>
           <div>
             date
             <input
-              type="date"
+              type="text"
               name="date"
               value={newDiary.date}
               onChange={handleChange}
