@@ -65,27 +65,76 @@ const App = () => {
           <div>
             date
             <input
-              type="text"
+              type="date"
               name="date"
               value={newDiary.date}
               onChange={handleChange}
             />
           </div>
           <div>
-            visibility
+            visibility great
             <input
-              type="text"
+              type="radio"
               name="visibility"
-              value={newDiary.visibility}
+              value="great"
+              onChange={handleChange}
+            />
+            good
+            <input
+              type="radio"
+              name="visibility"
+              value="good"
+              onChange={handleChange}
+            />
+            ok
+            <input
+              type="radio"
+              name="visibility"
+              value="ok"
+              onChange={handleChange}
+            />
+            poor
+            <input
+              type="radio"
+              name="visibility"
+              value="poor"
               onChange={handleChange}
             />
           </div>
           <div>
-            weather
+            weather sunny
             <input
-              type="text"
+              type="radio"
               name="weather"
-              value={newDiary.weather}
+              value="sunny"
+              onChange={handleChange}
+            />
+            rainy
+            <input
+              type="radio"
+              name="weather"
+              value="rainy"
+              onChange={handleChange}
+            />
+            cloudy
+            <input
+              type="radio"
+              name="weather"
+              value="cloudy"
+              onChange={handleChange}
+            />
+            stormy
+            <input
+              type="radio"
+              name="weather"
+              value="stormy"
+              onChange={handleChange}
+            />
+            windy
+            <input
+              type="radio"
+              name="weather"
+              value="windy"
               onChange={handleChange}
             />
           </div>
