@@ -3,13 +3,16 @@ import { NewPatientEntry, Patient, PatientEntriesWithoutSSN } from "../types";
 import { v1 as uuid } from "uuid";
 
 const getPatients = (): PatientEntriesWithoutSSN => {
-  return patients.map(({ id, name, dateOfBirth, gender, occupation }) => ({
-    id,
-    name,
-    dateOfBirth,
-    gender,
-    occupation,
-  }));
+  return patients.map(
+    ({ id, name, dateOfBirth, gender, occupation, entries }) => ({
+      id,
+      name,
+      dateOfBirth,
+      gender,
+      occupation,
+      entries,
+    })
+  );
 };
 
 const addPatient = (entry: NewPatientEntry): Patient => {
