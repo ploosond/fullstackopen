@@ -14,7 +14,10 @@ export interface Diagnosis {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
-export interface Entry {}
+export type Entry =
+  | HospitalEntry
+  | OccupationalHealthcareEntry
+  | HealthCheckEntry;
 
 export interface Patient {
   id: string;
@@ -54,4 +57,21 @@ export enum HealthCheckRating {
 interface HealthCheckEntry extends BaseEntry {
   type: "HealthCheck";
   healthCheckRating: HealthCheckRating;
+}
+
+interface OccupationalHealthcareEntry extends BaseEntry {
+  type: "OccupationalHealthcare";
+  employerName: string;
+  sickLeave?: {
+    startDate: string;
+    endDate: str;
+  };
+}
+
+interface HospitalEntry extends BaseEntry {
+  type: "Hospital";
+  discharge: {
+    date: string;
+    criteria: string;
+  };
 }
