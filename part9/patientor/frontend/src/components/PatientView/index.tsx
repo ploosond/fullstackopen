@@ -1,15 +1,16 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { Patient } from "../../types";
+import { Diagnosis, Patient } from "../../types";
 import patientService from "../../services/patients";
+import diagnosesService from "../../services/diagnoses";
 
 import { Box, List, ListItem, Typography } from "@mui/material";
 import { Female, Male } from "@mui/icons-material";
 
 const PatientView = () => {
   const [patient, setPatient] = useState<Patient>();
+  const [diagnoses, setDiagnoses] = useState<Diagnosis[]>([]);
   const { id } = useParams();
-  console.log(patient);
 
   useEffect(() => {
     const fetchPatient = async () => {
@@ -17,7 +18,13 @@ const PatientView = () => {
       setPatient(patient);
     };
 
+    const fetchDiagnoses = async () => {
+      const diagnoses = await diagnosesService.getAll();
+      setDiagnoses(diagnoses);
+    };
+
     void fetchPatient();
+    void fetchDiagnoses();
   }, [id]);
 
   return (
@@ -44,7 +51,9 @@ const PatientView = () => {
               {entry.diagnosisCodes?.map((d) => (
                 <List sx={{ listStyle: "disc", marginLeft: 6 }} key={d}>
                   <ListItem sx={{ display: "list-item", padding: 0 }}>
-                    {d}
+                    {d +
+                      " " +
+                      diagnoses.find((element) => element.code === d)?.name}
                   </ListItem>
                 </List>
               ))}
