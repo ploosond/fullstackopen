@@ -13,12 +13,6 @@ export interface Diagnosis {
   latin?: string;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
-export type Entry =
-  | HospitalEntry
-  | OccupationalHealthcareEntry
-  | HealthCheckEntry;
-
 export interface Patient {
   id: string;
   name: string;
@@ -64,7 +58,7 @@ interface OccupationalHealthcareEntry extends BaseEntry {
   employerName: string;
   sickLeave?: {
     startDate: string;
-    endDate: str;
+    endDate: string;
   };
 }
 
@@ -75,3 +69,14 @@ interface HospitalEntry extends BaseEntry {
     criteria: string;
   };
 }
+
+export type Entry =
+  | HospitalEntry
+  | OccupationalHealthcareEntry
+  | HealthCheckEntry;
+
+// type UnionOmit<T, K extends string | number | symbol> = T extends unknown
+//   ? Omit<T, K>
+//   : never;
+
+// type EntryWithoutId = UnionOmit<Entry, "id">;
